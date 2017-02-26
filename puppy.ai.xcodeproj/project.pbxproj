@@ -329,22 +329,22 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../tensorflow/contrib/makefile/downloads/protobuf/src",
-					"$(SRCROOT)/../tensorflow/contrib/makefile/downloads",
-					"$(SRCROOT)/../tensorflow/contrib/makefile/gen/proto",
-					"$(SRCROOT)/../../tensorflow/",
-					"$(SRCROOT)/../tensorflow/contrib/makefile/downloads/eigen",
+					"$(SRCROOT)/lib/tensorflow/tensorflow/contrib/makefile/downloads/protobuf/src",
+					"$(SRCROOT)/lib/tensorflow/tensorflow/contrib/makefile/downloads",
+					"$(SRCROOT)/lib/tensorflow/tensorflow/contrib/makefile/gen/proto",
+					"$(SRCROOT)/lib/tensorflow/tensorflow/contrib/makefile/downloads/eigen",
+					"$(SRCROOT)/lib/tensorflow/",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LIBRARY_SEARCH_PATHS = (
-					"$(SRCROOT)/../tensorflow/contrib/makefile/gen/protobuf_ios/lib",
-					"$(SRCROOT)/../tensorflow/contrib/makefile/gen/lib",
+					"$(SRCROOT)/lib/tensorflow/tensorflow/contrib/makefile/gen/protobuf_ios/lib",
+					"$(SRCROOT)/lib/tensorflow/tensorflow/contrib/makefile/gen/lib",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-force_load",
-					"$(SRCROOT)/../tensorflow/contrib/makefile/gen/lib/libtensorflow-core.a",
+					"$(SRCROOT)/lib/tensorflow/tensorflow/contrib/makefile/gen/lib/libtensorflow-core.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.puppywoof.match;
 				PRODUCT_NAME = puppy.ai;
@@ -389,22 +389,22 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../tensorflow/contrib/makefile/downloads/protobuf/src",
-					"$(SRCROOT)/../tensorflow/contrib/makefile/downloads",
-					"$(SRCROOT)/../tensorflow/contrib/makefile/gen/proto",
-					"$(SRCROOT)/../../tensorflow/",
-					"$(SRCROOT)/../tensorflow/contrib/makefile/downloads/eigen",
+					"$(SRCROOT)/lib/tensorflow/tensorflow/contrib/makefile/downloads/protobuf/src",
+					"$(SRCROOT)/lib/tensorflow/tensorflow/contrib/makefile/downloads",
+					"$(SRCROOT)/lib/tensorflow/tensorflow/contrib/makefile/gen/proto",
+					"$(SRCROOT)/lib/tensorflow/tensorflow/contrib/makefile/downloads/eigen",
+					"$(SRCROOT)/lib/tensorflow/",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LIBRARY_SEARCH_PATHS = (
-					"$(SRCROOT)/../tensorflow/contrib/makefile/gen/protobuf_ios/lib",
-					"$(SRCROOT)/../tensorflow/contrib/makefile/gen/lib",
+					"$(SRCROOT)/lib/tensorflow/tensorflow/contrib/makefile/gen/protobuf_ios/lib",
+					"$(SRCROOT)/lib/tensorflow/tensorflow/contrib/makefile/gen/lib",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-force_load",
-					"$(SRCROOT)/../tensorflow/contrib/makefile/gen/lib/libtensorflow-core.a",
+					"$(SRCROOT)/lib/tensorflow/tensorflow/contrib/makefile/gen/lib/libtensorflow-core.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.puppywoof.match;
 				PRODUCT_NAME = puppy.ai;
