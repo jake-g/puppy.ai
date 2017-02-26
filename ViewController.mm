@@ -495,7 +495,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
   }
   else {    // No dog detected
     [self removeAllLabelLayers];
-    [self addLabelLayerWithText:@"No Dog Detected..."
+    [self addLabelLayerWithText:@"Point camera at a dog..."
                         originX:2*colMargin
                         originY:2*rowMargin
                           width:labelWidth
