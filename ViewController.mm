@@ -83,8 +83,7 @@ static const NSString *AVCaptureStillImageIsCapturingStillImageContext =
   [[videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
 
   previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:session];
-  [previewLayer setBackgroundColor:[[UIColor blackColor] CGColor]];
-  [previewLayer setVideoGravity:AVLayerVideoGravityResizeAspect];
+  [previewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
   CALayer *rootLayer = [previewView layer];
   [rootLayer setMasksToBounds:YES];
   [previewLayer setFrame:[rootLayer bounds]];
@@ -148,16 +147,7 @@ static const NSString *AVCaptureStillImageIsCapturingStillImageContext =
   }
 }
 
-- (AVCaptureVideoOrientation)avOrientationForDeviceOrientation:
-    (UIDeviceOrientation)deviceOrientation {
-  AVCaptureVideoOrientation result =
-      (AVCaptureVideoOrientation)(deviceOrientation);
-  if (deviceOrientation == UIDeviceOrientationLandscapeLeft)
-    result = AVCaptureVideoOrientationLandscapeRight;
-  else if (deviceOrientation == UIDeviceOrientationLandscapeRight)
-    result = AVCaptureVideoOrientationLandscapeLeft;
-  return result;
-}
+
 
 
 // Take Snap
@@ -210,7 +200,7 @@ static const NSString *AVCaptureStillImageIsCapturingStillImageContext =
           apertureSize.height * (frameSize.height / apertureSize.width);
       size.height = frameSize.height;
     }
-  } else if ([gravity isEqualToString:AVLayerVideoGravityResizeAspect]) {
+  } else if ([gravity isEqualToString:AVLayerVideoGravityResizeAspectFill]) {
     if (viewRatio > apertureRatio) {
       size.width =
           apertureSize.height * (frameSize.height / apertureSize.width);
@@ -220,7 +210,7 @@ static const NSString *AVCaptureStillImageIsCapturingStillImageContext =
       size.height =
           apertureSize.width * (frameSize.width / apertureSize.height);
     }
-  } else if ([gravity isEqualToString:AVLayerVideoGravityResize]) {
+  } else if ([gravity isEqualToString:AVLayerVideoGravityResizeAspectFill]) {
     size.width = frameSize.width;
     size.height = frameSize.height;
   }
@@ -401,7 +391,37 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (void)viewDidAppear:(BOOL)animated {
   [super viewDidAppear:animated];
+    
 }
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator
+{
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        UIInterfaceOrientation interfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
+        AVCaptureVideoOrientation newOrientation = AVCaptureVideoOrientationPortrait;
+        
+        if (interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown)
+            newOrientation = AVCaptureVideoOrientationPortraitUpsideDown;
+        
+        if (interfaceOrientation == UIInterfaceOrientationPortrait)
+            newOrientation = AVCaptureVideoOrientationPortrait;
+        
+        if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft)
+            newOrientation = AVCaptureVideoOrientationLandscapeLeft;
+        
+        if (interfaceOrientation == UIInterfaceOrientationLandscapeRight)
+            newOrientation = AVCaptureVideoOrientationLandscapeRight;
+        
+        [previewLayer.connection setVideoOrientation:newOrientation];
+        CALayer *rootLayer = [previewView layer];
+        [previewLayer setFrame:[rootLayer bounds]];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        
+    }];
+}
+
 
 - (void)viewWillDisappear:(BOOL)animated {
   [super viewWillDisappear:animated];
@@ -413,7 +433,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:
     (UIInterfaceOrientation)interfaceOrientation {
-  return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return YES;
 }
 
 - (BOOL)prefersStatusBarHidden {
@@ -593,7 +613,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
   CATextLayer *background = [CATextLayer layer];
   [background setBackgroundColor:[UIColor blackColor].CGColor];
-  [background setOpacity:0.5f];
+  [background setOpacity:0.15f];
   [background setFrame:backgroundBounds];
   background.cornerRadius = 5.0f;
 
@@ -613,6 +633,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
   [[self.view layer] addSublayer:layer];
   [labelLayers addObject:layer];
 }
+
+
 
 - (void)setPredictionText:(NSString *)text withDuration:(float)duration {
   if (duration > 0.0) {
@@ -648,5 +670,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
   utterance.rate = 0.75 * AVSpeechUtteranceDefaultSpeechRate;
   [synth speakUtterance:utterance];
 }
+
+
 
 @end
