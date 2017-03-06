@@ -444,7 +444,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 // Write predictions
 - (void)setPredictionValues:(NSDictionary *)newValues {
-  const float decayValue = 0.75f;
+  const float decayValue = 0.75f;  // how fast predictions decay
   const float updateValue = 0.25f;
   const float minimumThreshold = 0.01f;
 
@@ -500,14 +500,14 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 //  const float headerValueWidth = 96.0f;
 //  const float headerLabelWidth = 198.0f;
-    
-  const float colMargin = 5.0f;
-  const float rowMargin = 5.0f;
+  NSString *defaultFont = @"Helvetica Neue-Regular";
+  const float colMargin = 0;
+  const float rowMargin = 0;
   const float rowHeight = 26.0f;  // header, label and value height
   const float entryMargin = rowMargin + rowHeight;
 
-  const float valueWidth = 84.0f;
-  const float labelWidth = 264.0f;
+  const float valueWidth = 100.0f;
+  const float labelWidth = 2000.0f;  // use full width TODO get this from device
 //  const float labelMarginX = 5.0f;
 
   if ([sortedLabels count] > 0) {
@@ -516,11 +516,12 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
   else {    // No dog detected
     [self removeAllLabelLayers];
     [self addLabelLayerWithText:@"Point camera at a dog..."
+                        font:defaultFont
                         originX:2*colMargin
                         originY:2*rowMargin
-                          width:labelWidth
-                         height:rowHeight
-                      alignment:kCAAlignmentLeft];
+                        width:labelWidth
+                        height:rowHeight
+                        alignment:kCAAlignmentLeft];
   }
 
   int labelCount = 0;
@@ -529,21 +530,23 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     // Add header
     if (labelCount == 0) {
 
-        [self addLabelLayerWithText:@"Certainty"
+        [self addLabelLayerWithText:@"Likelihood"
+                            font:@"Helvetica-Bold"
                             originX:colMargin
                             originY:rowMargin
-                              width:valueWidth
-                             height:rowHeight
-                          alignment:kCAAlignmentRight];
+                            width:valueWidth
+                            height:rowHeight
+                            alignment:kCAAlignmentRight];
         
         const float breedOriginX = (colMargin + valueWidth + colMargin);
         
         [self addLabelLayerWithText:@"Dog Breed"
+                            font:@"Helvetica-Bold"
                             originX:breedOriginX
                             originY:rowMargin
-                              width:labelWidth
-                             height:rowHeight
-                          alignment:kCAAlignmentLeft];
+                            width:labelWidth
+                            height:rowHeight
+                            alignment:kCAAlignmentLeft];
     }
     
     // Add label entry
@@ -558,20 +561,22 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     NSString *valueText = [NSString stringWithFormat:@"%d%%", valuePercentage];
       
     [self addLabelLayerWithText:valueText
+                        font:defaultFont
                         originX:colMargin
                         originY:originY
-                          width:valueWidth
-                         height:rowHeight
-                      alignment:kCAAlignmentRight];
+                        width:valueWidth
+                        height:rowHeight
+                        alignment:kCAAlignmentRight];
 
     const float labelOriginX = (colMargin + valueWidth + colMargin);
 
     [self addLabelLayerWithText:[label capitalizedString]
+                        font:defaultFont
                         originX:labelOriginX
                         originY:originY
-                          width:labelWidth
-                         height:rowHeight
-                      alignment:kCAAlignmentLeft];
+                        width:labelWidth
+                        height:rowHeight
+                        alignment:kCAAlignmentLeft];
     
     // Speak if 50% confident
     if ((labelCount == 0) && (value > 0.5f)) {
@@ -594,12 +599,13 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 }
 
 - (void)addLabelLayerWithText:(NSString *)text
+                      font: (NSString *const)font
                       originX:(float)originX
                       originY:(float)originY
                         width:(float)width
                        height:(float)height
                     alignment:(NSString *)alignment {
-  NSString *const font = @"Helvetica Neue-Regular";
+//  NSString *const font = @"Helvetica Neue-Regular";
   const float fontSize = 16.0f;
 
   const float marginSizeX = 5.0f;
@@ -615,7 +621,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
   [background setBackgroundColor:[UIColor blackColor].CGColor];
   [background setOpacity:0.15f];
   [background setFrame:backgroundBounds];
-  background.cornerRadius = 5.0f;
+//  background.cornerRadius = 5.0f;
 
   [[self.view layer] addSublayer:background];
   [labelLayers addObject:background];
