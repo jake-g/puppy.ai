@@ -9,6 +9,8 @@
 - Folder structure cleaned and updated project name
 - 'no dog detected' text to 'Point camera at a dog'
 - Updated splash screen
+- Added paw icon for freeze
+- Retrained and updated labels and graph
 
 ### Added
 - Added certainty and breed table heading

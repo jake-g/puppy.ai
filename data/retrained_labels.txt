@@ -1,6 +1,6 @@
 dogue de bordeaux
 rottweiler
-bull mastiff
+chow chow
 belgian sheepdog
 australian shepherd
 bichon frise
@@ -8,27 +8,27 @@ saint bernard
 standard poodle
 anatolian shepherd dog
 brussels griffon
-sussex spaniel
 giant schnauzer
-papillon
+chihuahua
+american foxhound
 weimaraner
 smooth fox terrier
 cocker spaniel
 basenji
 beagle
-chihuahua
-english foxhound
+border terrier
 flat coated retriever
 beauceron
 brabancon griffon
-lakeland terrier
+golden retriever
+glen of imaal terrier
 airedale terrier
 lowchen
 toy poodle
 norwegian buhund
 clumber spaniel
-komondor
-belgian malinois
+boxer
+japanese chin
 vizsla
 old english sheepdog
 welsh springer spaniel
@@ -37,7 +37,6 @@ border collie
 toy terrier
 american bulldog
 dingo
-malamute
 french bulldog
 borzoi
 curly coated retriever
@@ -48,24 +47,26 @@ pembroke welsh corgi
 australian terrier
 parson russell terrier
 shetland sheepdog
-cairn
 chinese shar pei
 german shorthaired pointer
 tibetan terrier
 briard
 english springer spaniel
 wire haired fox terrier
+groenendael
 samoyed
 australian cattle dog
 cane corso
 icelandic sheepdog
 whippet
 saluki
-lhasa
-golden retriever
+english bulldog
+malinois
 kuvasz
 dandie dinmont terrier
+lhasa apso
 appenzeller
+norfolk terrier
 field spaniel
 schipperke
 pomeranian
@@ -74,7 +75,7 @@ pug
 blenheim spaniel
 bernese mountain dog
 wirehaired pointing griffon
-groenendael
+papillon
 canaan dog
 dalmatian
 havanese
@@ -88,26 +89,24 @@ brittany
 dhole
 miniature poodle
 affenpinscher
-chow
 redbone
 irish terrier
 german shepherd dog
-american staffordshire terrier
+sussex spaniel
+lakeland terrier
 silky terrier
 yorkshire terrier
 sealyham terrier
-japanese chin
-poodle
+belgian malinois
 chinese crested
 maltese
 dachshund
 irish wolfhound
-finnish spitz
-malinois
+entlebucher mountain dog
 english cocker spaniel
 standard schnauzer
 belgian tervuren
-entlebucher mountain dog
+finnish spitz
 mexican hairless
 english toy spaniel
 petit basset griffon vendeen
@@ -116,16 +115,17 @@ cairn terrier
 english setter
 kelpie
 greyhound
-border terrier
+english foxhound
 afghan hound
 nova scotia duck tolling retriever
-norfolk terrier
+american staffordshire terrier
 irish setter
+labradoodle
 boston bull
 norwegian lundehund
 ibizan hound
 american water spaniel
-shih tzu
+labrador retriever
 basset hound
 shiba inu
 german wirehaired pointer
@@ -148,14 +148,11 @@ leonberger
 pekingese
 portuguese water dog
 italian greyhound
-bulldog
 chesapeake bay retriever
 norwich terrier
-eskimo dog
 bearded collie
 doberman pinscher
 african hunting dog
-cardigan
 miniature schnauzer
 black russian terrier
 boykin spaniel
@@ -169,11 +166,11 @@ soft coated wheaten terrier
 tibetan mastiff
 miniature pinscher
 german pinscher
-labrador retriever
+shih tzu
 norwegian elkhound
 scottish deerhound
 walker hound
-boxer
+komondor
 otterhound
 cardigan welsh corgi
 american eskimo dog
