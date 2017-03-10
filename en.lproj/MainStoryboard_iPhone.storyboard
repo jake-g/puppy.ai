@@ -36,7 +36,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <inset key="contentEdgeInsets" minX="0.0" minY="50" maxX="12" maxY="0.0"/>
-                                <state key="normal" title="Continue" backgroundImage="paw"/>
+                                <state key="normal" title="Freeze" backgroundImage="paw"/>
                                 <connections>
                                     <action selector="takePicture:" destination="2" eventType="touchUpInside" id="8df-li-3yo"/>
                                 </connections>
