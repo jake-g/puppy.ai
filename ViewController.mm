@@ -6,7 +6,7 @@
 #import <CoreImage/CoreImage.h>
 #import <ImageIO/ImageIO.h>
 #import "ViewController.h"
-
+#import <Accelerate/Accelerate.h>
 #include <sys/time.h>
 
 #include "tensorflow_utils.h"
@@ -233,11 +233,90 @@ static const NSString *AVCaptureStillImageIsCapturingStillImageContext =
 - (void)captureOutput:(AVCaptureOutput *)captureOutput
 didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
        fromConnection:(AVCaptureConnection *)connection {
-  CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
-  [self runCNNOnFrame:pixelBuffer];
+    [self setVideoOriantation:connection];
+    //CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    CVPixelBufferRef pixelBuffer = [self rotateBuffer:sampleBuffer withConstant:1]; //roate 90 degrees
+    [self runCNNOnFrame:pixelBuffer];
 }
 
+-(void)setVideoOriantation:(AVCaptureConnection *)connection {
+    UIInterfaceOrientation interfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
+    AVCaptureVideoOrientation newOrientation = AVCaptureVideoOrientationPortrait;
+    
+    if (interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown)
+        newOrientation = AVCaptureVideoOrientationPortraitUpsideDown;
+    
+    if (interfaceOrientation == UIInterfaceOrientationPortrait)
+        newOrientation = AVCaptureVideoOrientationPortrait;
+    
+    if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft)
+        newOrientation = AVCaptureVideoOrientationLandscapeLeft;
+    
+    if (interfaceOrientation == UIInterfaceOrientationLandscapeRight)
+        newOrientation = AVCaptureVideoOrientationLandscapeRight;
+    connection.videoOrientation = newOrientation;
 
+}
+
+- (CVPixelBufferRef)rotateBuffer:(CMSampleBufferRef)sampleBuffer withConstant:(uint8_t)rotationConstant
+{
+    CVImageBufferRef imageBuffer        = CMSampleBufferGetImageBuffer(sampleBuffer);
+    CVPixelBufferLockBaseAddress(imageBuffer, 0);
+    
+    OSType pixelFormatType              = CVPixelBufferGetPixelFormatType(imageBuffer);
+    
+    const size_t kAlignment             = 32;
+    const size_t kBytesPerPixel         = 4;
+    
+    size_t bytesPerRow                  = CVPixelBufferGetBytesPerRow(imageBuffer);
+    size_t width                        = CVPixelBufferGetWidth(imageBuffer);
+    size_t height                       = CVPixelBufferGetHeight(imageBuffer);
+    
+    BOOL rotatePerpendicular            = TRUE;
+    const size_t outWidth               = rotatePerpendicular ? height : width;
+    const size_t outHeight              = rotatePerpendicular ? width  : height;
+    
+    size_t bytesPerRowOut               = kBytesPerPixel * ceil(outWidth * 1.0 / kAlignment) * kAlignment;
+    
+    const size_t dstSize                = bytesPerRowOut * outHeight * sizeof(unsigned char);
+    
+    void *srcBuff                       = CVPixelBufferGetBaseAddress(imageBuffer);
+    
+    unsigned char *dstBuff              = (unsigned char *)malloc(dstSize);
+    
+    vImage_Buffer inbuff                = {srcBuff, height, width, bytesPerRow};
+    vImage_Buffer outbuff               = {dstBuff, outHeight, outWidth, bytesPerRowOut};
+    
+    uint8_t bgColor[4]                  = {0, 0, 0, 0};
+    
+    vImage_Error err                    = vImageRotate90_ARGB8888(&inbuff, &outbuff, rotationConstant, bgColor, 0);
+    if (err != kvImageNoError)
+    {
+        NSLog(@"%ld", err);
+    }
+    
+    CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+    
+    CVPixelBufferRef rotatedBuffer      = NULL;
+    CVPixelBufferCreateWithBytes(NULL,
+                                 outWidth,
+                                 outHeight,
+                                 pixelFormatType,
+                                 outbuff.data,
+                                 bytesPerRowOut,
+                                 freePixelBufferDataAfterRelease,
+                                 NULL,
+                                 NULL,
+                                 &rotatedBuffer);
+    
+    return rotatedBuffer;
+}
+
+void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddress)
+{
+    // Free the memory we malloced for the vImage rotation
+    free((void *)baseAddress);
+}
 // Conv Net
 - (void)runCNNOnFrame:(CVPixelBufferRef)pixelBuffer {
   assert(pixelBuffer != NULL);
@@ -291,7 +370,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
       }
     }
   }
-
+    
+  
+    
   if (tf_session.get()) {
     std::vector<tensorflow::Tensor> outputs;
     tensorflow::Status run_status = tf_session->Run(
@@ -399,22 +480,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        UIInterfaceOrientation interfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
-        AVCaptureVideoOrientation newOrientation = AVCaptureVideoOrientationPortrait;
-        
-        if (interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown)
-            newOrientation = AVCaptureVideoOrientationPortraitUpsideDown;
-        
-        if (interfaceOrientation == UIInterfaceOrientationPortrait)
-            newOrientation = AVCaptureVideoOrientationPortrait;
-        
-        if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft)
-            newOrientation = AVCaptureVideoOrientationLandscapeLeft;
-        
-        if (interfaceOrientation == UIInterfaceOrientationLandscapeRight)
-            newOrientation = AVCaptureVideoOrientationLandscapeRight;
-        
-        [previewLayer.connection setVideoOrientation:newOrientation];
+        [self setVideoOriantation:previewLayer.connection];
         CALayer *rootLayer = [previewView layer];
         [previewLayer setFrame:[rootLayer bounds]];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
