@@ -16,6 +16,14 @@ static NSString* model_file_name = @"mmapped_graph";  // optimized tf model
 static NSString* model_file_type = @"pb"; // input type
 static NSString* labels_file_name = @"retrained_labels";  // labels file
 static NSString* labels_file_type = @"txt";
+static NSString *defaultLabelFont = @"Helvetica Neue-Regular";
+const float colMargin = 0;
+const float rowMargin = 0;
+const float rowHeight = 26.0f;  // header, label and value height
+const float entryMargin = rowMargin + rowHeight;
+
+const float valueWidth = 100.0f;
+const float labelWidth = 2000.0f;
 
 const bool model_uses_memory_mapping = true;
 // These dimensions need to match those the model was trained with.
@@ -27,8 +35,6 @@ const float input_std = 128.0f;
 const std::string input_layer_name = "Mul";
 const std::string output_layer_name = "final_result";
 
-
-
 static const NSString *AVCaptureStillImageIsCapturingStillImageContext =
     @"AVCaptureStillImageIsCapturingStillImageContext";
 
@@ -38,6 +44,8 @@ static const NSString *AVCaptureStillImageIsCapturingStillImageContext =
 @end
 
 @implementation ViewController
+CVPixelBufferRef currentImageBuffer = nullptr;
+NSMutableArray *predictions = [NSMutableArray arrayWithCapacity:1];
 
 - (void)setupAVCapture {
   NSError *error = nil;
@@ -160,7 +168,15 @@ static const NSString *AVCaptureStillImageIsCapturingStillImageContext =
     [flashView setBackgroundColor:[UIColor whiteColor]];
     [flashView setAlpha:0.f];
     [[[self view] window] addSubview:flashView];
-
+    
+    swapCameraButton.hidden = TRUE;
+    feedbackButton.hidden = FALSE;
+      if (predictions.count>0) {
+          shareButton.hidden = FALSE;
+      }
+      
+    dogImageView.image = [self imageFromSampleBuffer:currentImageBuffer];
+      
     [UIView animateWithDuration:.2f
         animations:^{
           [flashView setAlpha:1.f];
@@ -174,13 +190,53 @@ static const NSString *AVCaptureStillImageIsCapturingStillImageContext =
                 [flashView removeFromSuperview];
                 [flashView release];
                 flashView = nil;
-              }];
+            }];
         }];
-
   } else {
     [session startRunning];
     [sender setTitle:@"Freeze" forState:UIControlStateNormal];
+      swapCameraButton.hidden = FALSE;
+      feedbackButton.hidden = TRUE;
+      shareButton.hidden = TRUE;
   }
+}
+
+- (UIImage *) imageFromSampleBuffer:(CVImageBufferRef) imageBuffer
+{
+    CVPixelBufferLockBaseAddress(imageBuffer, 0);
+    
+    void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
+    
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
+    size_t width = CVPixelBufferGetWidth(imageBuffer);
+    size_t height = CVPixelBufferGetHeight(imageBuffer);
+    
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    
+    CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8,
+                                                 bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+    
+    CGImageRef quartzImage = CGBitmapContextCreateImage(context);
+    CVPixelBufferUnlockBaseAddress(imageBuffer,0);
+    
+    CGContextRelease(context);
+    CGColorSpaceRelease(colorSpace);
+    
+    UIImage *image = [UIImage imageWithCGImage:quartzImage];
+    
+    CGImageRelease(quartzImage);
+    
+    return (image);
+}
+
+- (UIImage *)snapshot:(UIView *)view
+{
+    UIGraphicsBeginImageContextWithOptions(view.bounds.size, YES, 0);
+    [view drawViewHierarchyInRect:view.bounds afterScreenUpdates:YES];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return image;
 }
 
 + (CGRect)videoPreviewBoxForGravity:(NSString *)gravity
@@ -234,8 +290,11 @@ static const NSString *AVCaptureStillImageIsCapturingStillImageContext =
 didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
        fromConnection:(AVCaptureConnection *)connection {
     [self setVideoOriantation:connection];
-    //CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    
+    currentImageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    
     CVPixelBufferRef pixelBuffer = [self rotateBuffer:sampleBuffer withConstant:1]; //roate 90 degrees
+    
     [self runCNNOnFrame:pixelBuffer];
 }
 
@@ -403,7 +462,85 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
 - (void)dealloc {
   [self teardownAVCapture];
   [square release];
+  [swapCameraButton release];
+  [feedbackButton release];
+  [shareButton release];
   [super dealloc];
+}
+
+- (IBAction)showEmail:(id)sender {
+    
+    NSString *emailTitle = @"Puppy.ai user feedback";
+    NSString *messageBody = @"";
+    
+    if (predictions.count==2) {
+        messageBody = emailBody(predictions, dogImageView.image );
+    } else {
+        messageBody = emailBody(dogImageView.image );
+    }
+    
+    NSArray *toRecipents = [NSArray arrayWithObject:@"feedback@puppy.ai"];
+    
+    MFMailComposeViewController *mc = [[MFMailComposeViewController alloc] init];
+    mc.mailComposeDelegate = self;
+    [mc setSubject:emailTitle];
+    [mc setMessageBody:messageBody isHTML:YES];
+    [mc setToRecipients:toRecipents];
+    
+    [self presentViewController:mc animated:YES completion:NULL];
+    
+}
+
+NSString *emailBody(NSMutableArray *predictions, UIImage *image)
+{
+    NSString *format = @"<html>"
+    @"<body>"
+    @"<p>Hi,<br>"
+    @"I have used your app to determine breed of the dog:</p>"
+    @"<p><b><img src='data:image/png;base64,%@'></b></p>"
+    @"<br>puppy.ai thinks that it is %@ with %@ certainty or %@ with %@ certainty,but actully the dog breed is ..."
+    @"</body>"
+    @"</html>";
+    NSData *imageData = UIImagePNGRepresentation(image);
+    return [NSString stringWithFormat:format, [imageData base64EncodedStringWithOptions:0],predictions[0][0],predictions[0][1],
+            predictions[1][0],predictions[1][1]]; //ugly, need to rewrite later
+}
+
+NSString *emailBody(UIImage *image)
+{
+    NSString *format = @"<html>"
+    @"<body>"
+    @"<p>Hi,<br>"
+    @"I have used your app to determine breed of the dog:</p>"
+    @"<p><b><img src='data:image/png;base64,%@'></b></p>"
+    @"<br>puppy.ai thinks that it is not a dog,but actully the dog breed is ..."
+    @"</body>"
+    @"</html>";
+    NSData *imageData = UIImagePNGRepresentation(image);
+    return [NSString stringWithFormat:format, [imageData base64EncodedStringWithOptions:0]];
+}
+
+- (void) mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
+{
+    switch (result)
+    {
+        case MFMailComposeResultCancelled:
+            NSLog(@"Mail cancelled");
+            break;
+        case MFMailComposeResultSaved:
+            NSLog(@"Mail saved");
+            break;
+        case MFMailComposeResultSent:
+            NSLog(@"Mail sent");
+            break;
+        case MFMailComposeResultFailed:
+            NSLog(@"Mail sent failure: %@", [error localizedDescription]);
+            break;
+        default:
+            break;
+    }
+
+    [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
 // use front/back camera
@@ -566,14 +703,7 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
 
 //  const float headerValueWidth = 96.0f;
 //  const float headerLabelWidth = 198.0f;
-  NSString *defaultFont = @"Helvetica Neue-Regular";
-  const float colMargin = 0;
-  const float rowMargin = 0;
-  const float rowHeight = 26.0f;  // header, label and value height
-  const float entryMargin = rowMargin + rowHeight;
-
-  const float valueWidth = 100.0f;
-  const float labelWidth = 2000.0f;  // use full width TODO get this from device
+// use full width TODO get this from device
 //  const float labelMarginX = 5.0f;
 
   if ([sortedLabels count] > 0) {
@@ -581,38 +711,17 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
   }
   else {    // No dog detected
     [self removeAllLabelLayers];
-    [self addLabelLayerWithText:@"Point camera at a dog..."
-                        font:defaultFont
-                        originX:2*colMargin
-                        originY:2*rowMargin
-                        width:labelWidth
-                        height:rowHeight
-                        alignment:kCAAlignmentLeft];
+      [self addLabelToViewLeftCorner:self.view label:@"Point camera at a dog..."];
   }
 
   int labelCount = 0;
+
   for (NSDictionary *entry in sortedLabels) {
     
     // Add header
     if (labelCount == 0) {
-
-        [self addLabelLayerWithText:@"Likelihood"
-                            font:@"Helvetica-Bold"
-                            originX:colMargin
-                            originY:rowMargin
-                            width:valueWidth
-                            height:rowHeight
-                            alignment:kCAAlignmentRight];
-        
-        const float breedOriginX = (colMargin + valueWidth + colMargin);
-        
-        [self addLabelLayerWithText:@"Dog Breed"
-                            font:@"Helvetica-Bold"
-                            originX:breedOriginX
-                            originY:rowMargin
-                            width:labelWidth
-                            height:rowHeight
-                            alignment:kCAAlignmentLeft];
+        [predictions removeAllObjects];
+        [self addHeaderToView:self.view];
     }
     
     // Add label entry
@@ -620,30 +729,13 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
     NSNumber *valueObject = [entry objectForKey:@"value"];
     const float value = [valueObject floatValue];
     
-    const float originY =
-    (entryMargin + (rowHeight * labelCount));
-    
+      
     const int valuePercentage = (int)roundf(value * 100.0f);
     NSString *valueText = [NSString stringWithFormat:@"%d%%", valuePercentage];
-      
-    [self addLabelLayerWithText:valueText
-                        font:defaultFont
-                        originX:colMargin
-                        originY:originY
-                        width:valueWidth
-                        height:rowHeight
-                        alignment:kCAAlignmentRight];
-
-    const float labelOriginX = (colMargin + valueWidth + colMargin);
-
-    [self addLabelLayerWithText:[label capitalizedString]
-                        font:defaultFont
-                        originX:labelOriginX
-                        originY:originY
-                        width:labelWidth
-                        height:rowHeight
-                        alignment:kCAAlignmentLeft];
+    NSArray *prediction = [[NSArray alloc] initWithObjects:label,valueText,nil];
+    [predictions addObject:prediction];
     
+      [self addLabelsToView:self.view label:label value:valueText count:labelCount];
     // Speak if 50% confident
     if ((labelCount == 0) && (value > 0.5f)) {
       [self speak:[label capitalizedString]];
@@ -655,6 +747,71 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
       break;
     }
   }
+}
+
+-(void) addLabelToViewLeftCorner: (UIView*) view
+                           label:(NSString*) labelText {
+    [self addLabelLayerWithText:labelText
+                           font:defaultLabelFont
+                        originX:2*colMargin
+                        originY:2*rowMargin
+                          width:labelWidth
+                         height:rowHeight
+                      alignment:kCAAlignmentLeft
+                           view:view];
+}
+
+-(void)addHeaderToView:(UIView*)view {
+    [self addLabelLayerWithText:@"Likelihood"
+                           font:@"Helvetica-Bold"
+                        originX:colMargin
+                        originY:rowMargin
+                          width:valueWidth
+                         height:rowHeight
+                      alignment:kCAAlignmentRight
+                           view:view];
+    
+    const float breedOriginX = (colMargin + valueWidth + colMargin);
+    
+    [self addLabelLayerWithText:@"Dog Breed"
+                           font:@"Helvetica-Bold"
+                        originX:breedOriginX
+                        originY:rowMargin
+                          width:labelWidth
+                         height:rowHeight
+                      alignment:kCAAlignmentLeft
+                           view:view];
+}
+
+-(void)addLabelsToView:(UIView*) view
+                 label:(NSString*) label
+                 value: (NSString*) valueText
+                 count: (int) labelCount
+{
+    
+    const float originY =
+    (entryMargin + (rowHeight * labelCount));
+    
+    [self addLabelLayerWithText:valueText
+                           font:defaultLabelFont
+                        originX:colMargin
+                        originY:originY
+                          width:valueWidth
+                         height:rowHeight
+                      alignment:kCAAlignmentRight
+                           view:view];
+    
+    const float labelOriginX = (colMargin + valueWidth + colMargin);
+    
+    [self addLabelLayerWithText:[label capitalizedString]
+                           font:defaultLabelFont
+                        originX:labelOriginX
+                        originY:originY
+                          width:labelWidth
+                         height:rowHeight
+                      alignment:kCAAlignmentLeft
+                           view:view];
+
 }
 
 - (void)removeAllLabelLayers {
@@ -670,7 +827,8 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
                       originY:(float)originY
                         width:(float)width
                        height:(float)height
-                    alignment:(NSString *)alignment {
+                    alignment:(NSString *)alignment
+                         view:(UIView *) view {
 //  NSString *const font = @"Helvetica Neue-Regular";
   const float fontSize = 16.0f;
 
@@ -689,7 +847,7 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
   [background setFrame:backgroundBounds];
 //  background.cornerRadius = 5.0f;
 
-  [[self.view layer] addSublayer:background];
+  [[view layer] addSublayer:background];
   [labelLayers addObject:background];
 
   CATextLayer *layer = [CATextLayer layer];
@@ -702,7 +860,7 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
   layer.contentsScale = [[UIScreen mainScreen] scale];
   [layer setString:text];
 
-  [[self.view layer] addSublayer:layer];
+  [[view layer] addSublayer:layer];
   [labelLayers addObject:layer];
 }
 
@@ -743,6 +901,49 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
   [synth speakUtterance:utterance];
 }
 
+- (IBAction)share:(id)sender {
+    
+    for (UIView *subview in [dogImageView subviews]) {
+        [subview removeFromSuperview];
+    }
+
+    if (predictions.count==2) {
+        [self addHeaderToView:dogImageView];
+        [self addLabelsToView:dogImageView label:predictions[0][0] value:predictions[0][1]  count:0]; //ugly, need to rewrite
+        [self addLabelsToView:dogImageView label:predictions[1][0] value:predictions[1][1]  count:1];
+    } else {
+        [self addLabelToViewLeftCorner:dogImageView label:@"There are no dog detected"];
+    }
+    dogImageView.hidden = FALSE;
+    
+    UIImage *imageToShare = [self snapshot:dogImageView];
+    dogImageView.hidden = TRUE;
+    
+    NSArray *items = @[imageToShare];
+    
+   
+    UIActivityViewController *controller = [[UIActivityViewController alloc]initWithActivityItems:items applicationActivities:nil];
+    
+    NSArray *excluded = @[UIActivityTypePrint,
+                          UIActivityTypeCopyToPasteboard,
+                          UIActivityTypeAssignToContact,
+                          UIActivityTypeSaveToCameraRoll,
+                          UIActivityTypeAddToReadingList,
+                          UIActivityTypeAirDrop,
+                          UIActivityTypeMessage,
+                          UIActivityTypeMail,
+                          //UIActivityTypePostToFacebook
+                          UIActivityTypePostToTwitter,
+                          UIActivityTypePostToFlickr,
+                          UIActivityTypePostToVimeo,
+                          UIActivityTypePostToTencentWeibo,
+                          UIActivityTypePostToWeibo,
+                          UIActivityTypeOpenInIBooks
+                          ];
+    controller.excludedActivityTypes = excluded;
+    [self presentViewController:controller animated:YES completion:^{
+    }];
+}
 
 
 @end
