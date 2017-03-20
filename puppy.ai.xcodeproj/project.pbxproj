@@ -25,6 +25,7 @@
 		592FF92518EE240200C164F8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 592FF92218EE240200C164F8 /* AppDelegate.m */; };
 		592FF92618EE240200C164F8 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 592FF92418EE240200C164F8 /* ViewController.mm */; };
 		5993C7721D5D4E980048CE6A /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5993C7711D5D4E980048CE6A /* Accelerate.framework */; };
+		842C2C461E7DE66400907AD7 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 842C2C451E7DE66400907AD7 /* MessageUI.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,6 +55,7 @@
 		592FF92318EE240200C164F8 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = SOURCE_ROOT; };
 		592FF92418EE240200C164F8 /* ViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = SOURCE_ROOT; };
 		5993C7711D5D4E980048CE6A /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
+		842C2C451E7DE66400907AD7 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.2.sdk/System/Library/Frameworks/MessageUI.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				842C2C461E7DE66400907AD7 /* MessageUI.framework in Frameworks */,
 				5993C7721D5D4E980048CE6A /* Accelerate.framework in Frameworks */,
 				591D3EDF1CFFAD230059011C /* libprotobuf-lite.a in Frameworks */,
 				591D3EE01CFFAD230059011C /* libprotobuf.a in Frameworks */,
@@ -96,9 +99,9 @@
 		592FF8AA18ECBD3600C164F8 = {
 			isa = PBXGroup;
 			children = (
+				592FF8B718ECBD7600C164F8 /* Frameworks */,
 				237C9A0B1E6389D900093896 /* Images.xcassets */,
 				592FF8BE18ECBD7600C164F8 /* puppy.ai */,
-				592FF8B718ECBD7600C164F8 /* Frameworks */,
 				592FF8B618ECBD7600C164F8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -114,6 +117,7 @@
 		592FF8B718ECBD7600C164F8 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				842C2C451E7DE66400907AD7 /* MessageUI.framework */,
 				5993C7711D5D4E980048CE6A /* Accelerate.framework */,
 				591D3EDD1CFFAD230059011C /* libprotobuf-lite.a */,
 				591D3EDE1CFFAD230059011C /* libprotobuf.a */,
