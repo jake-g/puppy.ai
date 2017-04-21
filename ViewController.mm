@@ -8,6 +8,7 @@
 #import "ViewController.h"
 #import <Accelerate/Accelerate.h>
 #include <sys/time.h>
+#import <sys/utsname.h>
 
 #include "tensorflow_utils.h"
 
@@ -21,7 +22,7 @@ const float colMargin = 0;
 const float rowMargin = 0;
 const float rowHeight = 26.0f;  // header, label and value height
 const float entryMargin = rowMargin + rowHeight;
-
+const float fontSize = 16.0f;
 const float valueWidth = 100.0f;
 const float labelWidth = 2000.0f;
 
@@ -474,50 +475,65 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
     NSString *messageBody = @"";
     
     if (predictions.count==2) {
-        messageBody = emailBody(predictions, dogImageView.image );
+        messageBody = [self emailBody:predictions image: dogImageView.image];
     } else {
-        messageBody = emailBody(dogImageView.image );
+        messageBody = [self emailBody:dogImageView.image];
     }
     
-    NSArray *toRecipents = [NSArray arrayWithObject:@"feedback@puppy.ai"];
+    NSArray *toRecipents = [NSArray arrayWithObject:@"getpuppyai@gmail.com"];
     
     MFMailComposeViewController *mc = [[MFMailComposeViewController alloc] init];
     mc.mailComposeDelegate = self;
     [mc setSubject:emailTitle];
     [mc setMessageBody:messageBody isHTML:YES];
     [mc setToRecipients:toRecipents];
+    [mc addAttachmentData:UIImageJPEGRepresentation(dogImageView.image, 1) mimeType:@"image/jpeg" fileName:@"dogImage.jpg"];
     
     [self presentViewController:mc animated:YES completion:NULL];
     
 }
 
-NSString *emailBody(NSMutableArray *predictions, UIImage *image)
+- (NSString *) emailBody:(NSMutableArray*) predictions
+                   image:(UIImage*) image
 {
     NSString *format = @"<html>"
     @"<body>"
-    @"<p>Hi,<br>"
-    @"I have used your app to determine breed of the dog:</p>"
-    @"<p><b><img src='data:image/png;base64,%@'></b></p>"
-    @"<br>puppy.ai thinks that it is %@ with %@ certainty or %@ with %@ certainty,but actully the dog breed is ..."
+    @"<p>Hi puppy.ai team,</p>"
+    @"<p>I have used your app to determine the breed of the dog shown below.</p>"
+    @"<p>puppy.ai thinks that it is a %@ with %@ certainty or %@ with %@ certainty, but actually the dog breed is ...</p>"
+    @"<p>%@ | %@ version: %@ | puppy.ai version: %@ | build: %@</p>"
     @"</body>"
     @"</html>";
-    NSData *imageData = UIImagePNGRepresentation(image);
-    return [NSString stringWithFormat:format, [imageData base64EncodedStringWithOptions:0],predictions[0][0],predictions[0][1],
-            predictions[1][0],predictions[1][1]]; //ugly, need to rewrite later
+    //NSData *imageData = UIImagePNGRepresentation(image);
+    UIDevice *currentDevice  = [UIDevice currentDevice];
+    NSString *deviceModel = [self deviceName];
+    NSString *OSName = currentDevice.systemName;
+    NSString *OSVersion = currentDevice.systemVersion;
+    NSString *appVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+    NSString *buildNumber = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+    return [NSString stringWithFormat:format,predictions[0][0],predictions[0][1],
+            predictions[1][0],predictions[1][1], deviceModel,OSName,OSVersion,appVersion,buildNumber]; //ugly, need to rewrite later
 }
 
-NSString *emailBody(UIImage *image)
+- (NSString *) emailBody:(UIImage*) image
 {
     NSString *format = @"<html>"
     @"<body>"
-    @"<p>Hi,<br>"
-    @"I have used your app to determine breed of the dog:</p>"
-    @"<p><b><img src='data:image/png;base64,%@'></b></p>"
-    @"<br>puppy.ai thinks that it is not a dog,but actully the dog breed is ..."
+    @"<p>Hi puppy.ai team,</p>"
+    @"<p>I have used your app to determine the breed of the dog shown below.</p>"
+    @"<p>puppy.ai thinks that it is not a dog, but actually the dog breed is ...</p>"
+    @"<p>%@ | %@ version: %@ | puppy.ai version: %@ | build: %@</p>"
     @"</body>"
     @"</html>";
-    NSData *imageData = UIImagePNGRepresentation(image);
-    return [NSString stringWithFormat:format, [imageData base64EncodedStringWithOptions:0]];
+    
+    //NSData *imageData = UIImageJPEGRepresentation(image, 1);
+    UIDevice *currentDevice  = [UIDevice currentDevice];
+    NSString *deviceModel = [self deviceName];
+    NSString *OSName = currentDevice.systemName;
+    NSString *OSVersion = currentDevice.systemVersion;
+    NSString *appVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+    NSString *buildNumber = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+    return [NSString stringWithFormat:format,deviceModel,OSName,OSVersion,appVersion,buildNumber]; //ugly, need to rewrite later
 }
 
 - (void) mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
@@ -757,6 +773,7 @@ NSString *emailBody(UIImage *image)
                         originY:2*rowMargin
                           width:labelWidth
                          height:rowHeight
+                       fontSize:fontSize
                       alignment:kCAAlignmentLeft
                            view:view];
 }
@@ -768,6 +785,7 @@ NSString *emailBody(UIImage *image)
                         originY:rowMargin
                           width:valueWidth
                          height:rowHeight
+                       fontSize:fontSize
                       alignment:kCAAlignmentRight
                            view:view];
     
@@ -779,6 +797,7 @@ NSString *emailBody(UIImage *image)
                         originY:rowMargin
                           width:labelWidth
                          height:rowHeight
+                       fontSize:fontSize
                       alignment:kCAAlignmentLeft
                            view:view];
 }
@@ -798,6 +817,7 @@ NSString *emailBody(UIImage *image)
                         originY:originY
                           width:valueWidth
                          height:rowHeight
+                       fontSize:fontSize
                       alignment:kCAAlignmentRight
                            view:view];
     
@@ -809,9 +829,26 @@ NSString *emailBody(UIImage *image)
                         originY:originY
                           width:labelWidth
                          height:rowHeight
+                       fontSize:fontSize
                       alignment:kCAAlignmentLeft
                            view:view];
 
+}
+
+-(void)addFooterToView:(UIView*) view
+                 value: (NSString*) valueText
+{
+    
+    [self addLabelLayerWithText:valueText
+                           font:defaultLabelFont
+                        originX: dogImageView.frame.size.width - 315.00f
+                        originY: dogImageView.frame.size.height - rowHeight
+                          width:labelWidth
+                         height:18.00f
+                       fontSize:10.00f
+                      alignment:kCAAlignmentLeft
+                           view:view];
+    
 }
 
 - (void)removeAllLabelLayers {
@@ -827,10 +864,11 @@ NSString *emailBody(UIImage *image)
                       originY:(float)originY
                         width:(float)width
                        height:(float)height
+                     fontSize:(float)fontSize
                     alignment:(NSString *)alignment
                          view:(UIView *) view {
 //  NSString *const font = @"Helvetica Neue-Regular";
-  const float fontSize = 16.0f;
+
 
   const float marginSizeX = 5.0f;
   const float marginSizeY = 2.0f;
@@ -914,11 +952,12 @@ NSString *emailBody(UIImage *image)
     } else {
         [self addLabelToViewLeftCorner:dogImageView label:@"There are no dog detected"];
     }
+    [self addFooterToView:dogImageView value:@"You can do it too. Discover any dog's breed: https://puppyai.github.io"];
     dogImageView.hidden = FALSE;
     
     UIImage *imageToShare = [self snapshot:dogImageView];
     dogImageView.hidden = TRUE;
-    
+    NSURL *urlToShare = [[NSURL alloc] initWithString:@"https://puppyai.github.io"];
     NSArray *items = @[imageToShare];
     
    
@@ -931,10 +970,10 @@ NSString *emailBody(UIImage *image)
                           UIActivityTypeAddToReadingList,
                           UIActivityTypeAirDrop,
                           UIActivityTypeMessage,
-                          UIActivityTypeMail,
+                          //UIActivityTypeMail,
                           //UIActivityTypePostToFacebook
-                          UIActivityTypePostToTwitter,
-                          UIActivityTypePostToFlickr,
+                          //UIActivityTypePostToTwitter,
+                          //UIActivityTypePostToFlickr,
                           UIActivityTypePostToVimeo,
                           UIActivityTypePostToTencentWeibo,
                           UIActivityTypePostToWeibo,
@@ -943,6 +982,86 @@ NSString *emailBody(UIImage *image)
     controller.excludedActivityTypes = excluded;
     [self presentViewController:controller animated:YES completion:^{
     }];
+}
+
+- (NSString*) deviceName
+{
+    struct utsname systemInfo;
+    
+    uname(&systemInfo);
+    
+    NSString* code = [NSString stringWithCString:systemInfo.machine
+                                        encoding:NSUTF8StringEncoding];
+    
+    static NSDictionary* deviceNamesByCode = nil;
+    
+    if (!deviceNamesByCode) {
+        
+        deviceNamesByCode = @{@"i386"      :@"Simulator",
+                              @"x86_64"    :@"Simulator",
+                              @"iPod1,1"   :@"iPod Touch",        // (Original)
+                              @"iPod2,1"   :@"iPod Touch",        // (Second Generation)
+                              @"iPod3,1"   :@"iPod Touch",        // (Third Generation)
+                              @"iPod4,1"   :@"iPod Touch",        // (Fourth Generation)
+                              @"iPod7,1"   :@"iPod Touch",        // (6th Generation)
+                              @"iPhone1,1" :@"iPhone",            // (Original)
+                              @"iPhone1,2" :@"iPhone",            // (3G)
+                              @"iPhone2,1" :@"iPhone",            // (3GS)
+                              @"iPad1,1"   :@"iPad",              // (Original)
+                              @"iPad2,1"   :@"iPad 2",            //
+                              @"iPad3,1"   :@"iPad",              // (3rd Generation)
+                              @"iPhone3,1" :@"iPhone 4",          // (GSM)
+                              @"iPhone3,3" :@"iPhone 4",          // (CDMA/Verizon/Sprint)
+                              @"iPhone4,1" :@"iPhone 4S",         //
+                              @"iPhone5,1" :@"iPhone 5",          // (model A1428, AT&T/Canada)
+                              @"iPhone5,2" :@"iPhone 5",          // (model A1429, everything else)
+                              @"iPad3,4"   :@"iPad",              // (4th Generation)
+                              @"iPad2,5"   :@"iPad Mini",         // (Original)
+                              @"iPhone5,3" :@"iPhone 5c",         // (model A1456, A1532 | GSM)
+                              @"iPhone5,4" :@"iPhone 5c",         // (model A1507, A1516, A1526 (China), A1529 | Global)
+                              @"iPhone6,1" :@"iPhone 5s",         // (model A1433, A1533 | GSM)
+                              @"iPhone6,2" :@"iPhone 5s",         // (model A1457, A1518, A1528 (China), A1530 | Global)
+                              @"iPhone7,1" :@"iPhone 6 Plus",     //
+                              @"iPhone7,2" :@"iPhone 6",          //
+                              @"iPhone8,1" :@"iPhone 6S",         //
+                              @"iPhone8,2" :@"iPhone 6S Plus",    //
+                              @"iPhone8,4" :@"iPhone SE",         //
+                              @"iPhone9,1" :@"iPhone 7",          //
+                              @"iPhone9,3" :@"iPhone 7",          //
+                              @"iPhone9,2" :@"iPhone 7 Plus",     //
+                              @"iPhone9,4" :@"iPhone 7 Plus",     //
+                              
+                              @"iPad4,1"   :@"iPad Air",          // 5th Generation iPad (iPad Air) - Wifi
+                              @"iPad4,2"   :@"iPad Air",          // 5th Generation iPad (iPad Air) - Cellular
+                              @"iPad4,4"   :@"iPad Mini",         // (2nd Generation iPad Mini - Wifi)
+                              @"iPad4,5"   :@"iPad Mini",         // (2nd Generation iPad Mini - Cellular)
+                              @"iPad4,7"   :@"iPad Mini",         // (3rd Generation iPad Mini - Wifi (model A1599))
+                              @"iPad6,7"   :@"iPad Pro (12.9\")", // iPad Pro 12.9 inches - (model A1584)
+                              @"iPad6,8"   :@"iPad Pro (12.9\")", // iPad Pro 12.9 inches - (model A1652)
+                              @"iPad6,3"   :@"iPad Pro (9.7\")",  // iPad Pro 9.7 inches - (model A1673)
+                              @"iPad6,4"   :@"iPad Pro (9.7\")"   // iPad Pro 9.7 inches - (models A1674 and A1675)
+                              };
+    }
+    
+    NSString* deviceName = [deviceNamesByCode objectForKey:code];
+    
+    if (!deviceName) {
+        
+        if ([code rangeOfString:@"iPod"].location != NSNotFound) {
+            deviceName = @"iPod Touch";
+        }
+        else if([code rangeOfString:@"iPad"].location != NSNotFound) {
+            deviceName = @"iPad";
+        }
+        else if([code rangeOfString:@"iPhone"].location != NSNotFound){
+            deviceName = @"iPhone";
+        }
+        else {
+            deviceName = @"Unknown";
+        }
+    }
+    
+    return deviceName;
 }
 
 
