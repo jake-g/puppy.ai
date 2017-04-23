@@ -26,6 +26,7 @@
 		592FF92618EE240200C164F8 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 592FF92418EE240200C164F8 /* ViewController.mm */; };
 		5993C7721D5D4E980048CE6A /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5993C7711D5D4E980048CE6A /* Accelerate.framework */; };
 		842C2C461E7DE66400907AD7 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 842C2C451E7DE66400907AD7 /* MessageUI.framework */; };
+		84904EC01E9EBDF600A7A40F /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 84904EBF1E9EBDF600A7A40F /* Settings.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +57,7 @@
 		592FF92418EE240200C164F8 /* ViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = SOURCE_ROOT; };
 		5993C7711D5D4E980048CE6A /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
 		842C2C451E7DE66400907AD7 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.2.sdk/System/Library/Frameworks/MessageUI.framework; sourceTree = DEVELOPER_DIR; };
+		84904EBF1E9EBDF600A7A40F /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +150,7 @@
 				592FF90118ECC66200C164F8 /* main.mm */,
 				591D3ED41CFF85FD0059011C /* tensorflow_utils.h */,
 				591D3ED31CFF85FD0059011C /* tensorflow_utils.mm */,
+				84904EBF1E9EBDF600A7A40F /* Settings.bundle */,
 			);
 			name = puppy.ai;
 			path = SimpleExample;
@@ -211,6 +214,7 @@
 			files = (
 				230D31361E3973D900D01939 /* MainStoryboard_iPhone.storyboard in Resources */,
 				237C9A0C1E6389D900093896 /* Images.xcassets in Resources */,
+				84904EC01E9EBDF600A7A40F /* Settings.bundle in Resources */,
 				236141D81E307F5500D01939 /* retrained_labels.txt in Resources */,
 				236141D71E307F5500D01939 /* mmapped_graph.pb in Resources */,
 			);
