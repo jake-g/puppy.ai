@@ -26,7 +26,12 @@
 		592FF92618EE240200C164F8 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 592FF92418EE240200C164F8 /* ViewController.mm */; };
 		5993C7721D5D4E980048CE6A /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5993C7711D5D4E980048CE6A /* Accelerate.framework */; };
 		842C2C461E7DE66400907AD7 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 842C2C451E7DE66400907AD7 /* MessageUI.framework */; };
+		84657DC91F41FBE6008AAC5E /* PAIFeedback.m in Sources */ = {isa = PBXBuildFile; fileRef = 84657DC81F41FBE6008AAC5E /* PAIFeedback.m */; };
+		84657DCC1F41FF62008AAC5E /* PAIVideoPRocessing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 84657DCB1F41FF62008AAC5E /* PAIVideoPRocessing.mm */; };
 		84904EC01E9EBDF600A7A40F /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 84904EBF1E9EBDF600A7A40F /* Settings.bundle */; };
+		84B6AE751F40A95900D0281A /* PAIShare.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B6AE741F40A95900D0281A /* PAIShare.m */; };
+		84B6AE781F40AF2B00D0281A /* PAIResultLabels.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B6AE771F40AF2B00D0281A /* PAIResultLabels.m */; };
+		84C6B9B01F4128BD00FC23E6 /* PAICNNRunner.mm in Sources */ = {isa = PBXBuildFile; fileRef = 84C6B9AF1F4128BD00FC23E6 /* PAICNNRunner.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,7 +48,7 @@
 		591D3ED01CFF85C30059011C /* ios_image_load.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ios_image_load.h; sourceTree = SOURCE_ROOT; };
 		591D3ED11CFF85C30059011C /* ios_image_load.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ios_image_load.mm; sourceTree = SOURCE_ROOT; };
 		591D3ED31CFF85FD0059011C /* tensorflow_utils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = tensorflow_utils.mm; sourceTree = SOURCE_ROOT; };
-		591D3ED41CFF85FD0059011C /* tensorflow_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tensorflow_utils.h; sourceTree = SOURCE_ROOT; };
+		591D3ED41CFF85FD0059011C /* tensorflow_utils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = tensorflow_utils.h; sourceTree = SOURCE_ROOT; };
 		591D3EDD1CFFAD230059011C /* libprotobuf-lite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libprotobuf-lite.a"; path = "../../makefile/gen/protobuf_ios/lib/libprotobuf-lite.a"; sourceTree = "<group>"; };
 		591D3EDE1CFFAD230059011C /* libprotobuf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libprotobuf.a; path = ../../makefile/gen/protobuf_ios/lib/libprotobuf.a; sourceTree = "<group>"; };
 		592FF8B518ECBD7600C164F8 /* puppy.ai.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = puppy.ai.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -57,7 +62,17 @@
 		592FF92418EE240200C164F8 /* ViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = SOURCE_ROOT; };
 		5993C7711D5D4E980048CE6A /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
 		842C2C451E7DE66400907AD7 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.2.sdk/System/Library/Frameworks/MessageUI.framework; sourceTree = DEVELOPER_DIR; };
+		84657DC71F41FBE6008AAC5E /* PAIFeedback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PAIFeedback.h; sourceTree = SOURCE_ROOT; };
+		84657DC81F41FBE6008AAC5E /* PAIFeedback.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PAIFeedback.m; sourceTree = SOURCE_ROOT; };
+		84657DCA1F41FF62008AAC5E /* PAIVideoPRocessing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PAIVideoPRocessing.h; sourceTree = SOURCE_ROOT; };
+		84657DCB1F41FF62008AAC5E /* PAIVideoPRocessing.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PAIVideoPRocessing.mm; sourceTree = SOURCE_ROOT; };
 		84904EBF1E9EBDF600A7A40F /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = SOURCE_ROOT; };
+		84B6AE731F40A95900D0281A /* PAIShare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PAIShare.h; sourceTree = SOURCE_ROOT; };
+		84B6AE741F40A95900D0281A /* PAIShare.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PAIShare.m; sourceTree = SOURCE_ROOT; };
+		84B6AE761F40AF2B00D0281A /* PAIResultLabels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PAIResultLabels.h; sourceTree = SOURCE_ROOT; };
+		84B6AE771F40AF2B00D0281A /* PAIResultLabels.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PAIResultLabels.m; sourceTree = SOURCE_ROOT; };
+		84C6B9AE1F4128BD00FC23E6 /* PAICNNRunner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PAICNNRunner.h; sourceTree = SOURCE_ROOT; };
+		84C6B9AF1F4128BD00FC23E6 /* PAICNNRunner.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = PAICNNRunner.mm; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,6 +159,12 @@
 				592FF92218EE240200C164F8 /* AppDelegate.m */,
 				592FF92318EE240200C164F8 /* ViewController.h */,
 				592FF92418EE240200C164F8 /* ViewController.mm */,
+				84C6B9AE1F4128BD00FC23E6 /* PAICNNRunner.h */,
+				84C6B9AF1F4128BD00FC23E6 /* PAICNNRunner.mm */,
+				84B6AE761F40AF2B00D0281A /* PAIResultLabels.h */,
+				84B6AE771F40AF2B00D0281A /* PAIResultLabels.m */,
+				84B6AE731F40A95900D0281A /* PAIShare.h */,
+				84B6AE741F40A95900D0281A /* PAIShare.m */,
 				592FF90318ECCB8300C164F8 /* Info.plist */,
 				591D3ED01CFF85C30059011C /* ios_image_load.h */,
 				591D3ED11CFF85C30059011C /* ios_image_load.mm */,
@@ -151,6 +172,10 @@
 				591D3ED41CFF85FD0059011C /* tensorflow_utils.h */,
 				591D3ED31CFF85FD0059011C /* tensorflow_utils.mm */,
 				84904EBF1E9EBDF600A7A40F /* Settings.bundle */,
+				84657DC71F41FBE6008AAC5E /* PAIFeedback.h */,
+				84657DC81F41FBE6008AAC5E /* PAIFeedback.m */,
+				84657DCA1F41FF62008AAC5E /* PAIVideoPRocessing.h */,
+				84657DCB1F41FF62008AAC5E /* PAIVideoPRocessing.mm */,
 			);
 			name = puppy.ai;
 			path = SimpleExample;
@@ -227,9 +252,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84C6B9B01F4128BD00FC23E6 /* PAICNNRunner.mm in Sources */,
+				84B6AE781F40AF2B00D0281A /* PAIResultLabels.m in Sources */,
 				592FF90218ECC66200C164F8 /* main.mm in Sources */,
+				84B6AE751F40A95900D0281A /* PAIShare.m in Sources */,
+				84657DC91F41FBE6008AAC5E /* PAIFeedback.m in Sources */,
 				591D3ED21CFF85C30059011C /* ios_image_load.mm in Sources */,
 				592FF92618EE240200C164F8 /* ViewController.mm in Sources */,
+				84657DCC1F41FF62008AAC5E /* PAIVideoPRocessing.mm in Sources */,
 				592FF92518EE240200C164F8 /* AppDelegate.m in Sources */,
 				591D3ED51CFF85FD0059011C /* tensorflow_utils.mm in Sources */,
 			);

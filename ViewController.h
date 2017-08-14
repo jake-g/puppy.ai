@@ -1,35 +1,24 @@
-#import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
-#import <MessageUI/MessageUI.h>
-
-#include <memory>
-#include "tensorflow/core/public/session.h"
-#include "tensorflow/core/util/memmapped_file_system.h"
+#import "PAIFeedback.h"
+#import "PAIResultLabels.h"
+#import "PAIShare.h"
+#import "PAICNNRunner.h"
+#import "PAIVideoPRocessing.h"
 
 @interface ViewController
-    : UIViewController<UIGestureRecognizerDelegate,
-                       AVCaptureVideoDataOutputSampleBufferDelegate,MFMailComposeViewControllerDelegate> {
+    : UIViewController<UIGestureRecognizerDelegate> {
   IBOutlet UIView *previewView;
   IBOutlet UISegmentedControl *camerasControl;
   IBOutlet UIButton *swapCameraButton;
   IBOutlet UIButton *feedbackButton;
   IBOutlet UIImageView *dogImageView;
   IBOutlet UIButton *shareButton;
-  AVCaptureVideoPreviewLayer *previewLayer;
-  AVCaptureVideoDataOutput *videoDataOutput;
-  dispatch_queue_t videoDataOutputQueue;
-  AVCaptureStillImageOutput *stillImageOutput;
-  UIView *flashView;
+  
   UIImage *square;
-  BOOL isUsingFrontFacingCamera;
-  AVSpeechSynthesizer *synth;
-  NSMutableDictionary *oldPredictionValues;
-  NSMutableArray *labelLayers;
-  AVCaptureSession *session;
-                           
-  std::unique_ptr<tensorflow::Session> tf_session;
-  std::unique_ptr<tensorflow::MemmappedEnv> tf_memmapped_env;
-  std::vector<std::string> labels;
+
+  PAICNNRunner *cNNRunner;
+  PAIResultLabels *resultsLabels;
+  PAIVideoPRocessing *videoPRocessing;
 }
 @property(retain, nonatomic) CATextLayer *predictionTextLayer;
 
@@ -37,6 +26,6 @@
 - (IBAction)switchCameras:(id)sender;
 - (IBAction)showEmail:(id)sender;
 - (IBAction)share:(id)sender;
-
+- (void)runCNNOnFrameWith:(CVPixelBufferRef)RotatedPixelBuffer AndWith: (UIImage*)Image;
 
 @end
