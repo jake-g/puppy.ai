@@ -17,13 +17,15 @@ const float input_std = 128.0f;
 const std::string input_layer_name = "Mul";
 const std::string output_layer_name = "final_result";
 static NSMutableDictionary *oldPredictionValues = nil;
+static NSMutableDictionary *labelCumSum = nil;
 
 -(id)init
 {
     self = [super init];
-    if (oldPredictionValues==nil)
+    if (oldPredictionValues==nil || labelCumSum==nil)
     {
         oldPredictionValues = [[NSMutableDictionary alloc] init];
+        labelCumSum = [[NSMutableDictionary alloc] init];
     }
     
     tensorflow::Status load_status;
@@ -51,6 +53,15 @@ static NSMutableDictionary *oldPredictionValues = nil;
 {
     [oldPredictionValues release];
     [super dealloc];
+}
+
+- (void)redirectLogToDocuments 
+{
+     NSArray *allPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+     NSString *documentsDirectory = [allPaths objectAtIndex:0];
+     NSString *pathForLog = [documentsDirectory stringByAppendingPathComponent:@"log.txt"];
+
+     freopen([pathForLog cStringUsingEncoding:NSASCIIStringEncoding],"a+",stderr);
 }
 
 -(void)RunCNNWith:(CVPixelBufferRef)pixelBuffer AndCompletionHandler:(void(^)(NSArray*))handler
@@ -184,7 +195,23 @@ static NSMutableDictionary *oldPredictionValues = nil;
             NSNumber *oldPredictionValueObject =
             [oldPredictionValues objectForKey:label];
             const float oldPredictionValue = [oldPredictionValueObject floatValue];
-            if (oldPredictionValue > 0.05f) {
+            if (oldPredictionValue > 0.025f) {
+              
+                // Track cumulative sum
+                NSNumber *sumObj = [labelCumSum objectForKey:label];
+                if (sumObj == nil) {
+                  sumObj = [NSNumber numberWithFloat:0];
+                  [labelCumSum setObject:oldPredictionValueObject forKey:label];
+                } else {
+                  const float oldSum = [sumObj floatValue];
+                  const float newSum = oldPredictionValue + oldSum;
+                  sumObj = [NSNumber numberWithFloat:newSum];
+                  [labelCumSum setObject:sumObj forKey:label];
+
+                }
+              
+                NSLog(@", %@, %f, %@", label, oldPredictionValue, sumObj);
+
                 NSDictionary *entry = @{
                                         @"label" : label,
                                         @"value" : oldPredictionValueObject
@@ -192,6 +219,14 @@ static NSMutableDictionary *oldPredictionValues = nil;
                 candidateLabels = [candidateLabels arrayByAddingObject:entry];
             }
         }
+  
+        // Reset sum if no labels are detected
+        // TODO not workin, need to reset sums
+        
+//        if ([candidateLabels count] == 0) {
+//          labelCumSum = [[NSMutableDictionary alloc] init];
+//
+//        }
         return candidateLabels;
 }
 
