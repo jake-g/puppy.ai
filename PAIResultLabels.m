@@ -12,6 +12,7 @@ NSString *defaultLabelFont = @"Helvetica Neue-Regular";
 NSString *BoldLabelFont = @"Helvetica-Bold";
 NSString *DogBreedColumnName = @"Dog Breed";
 NSString *LikelihoodColumnName = @"Likelihood";
+NSString *pointCamera = @"Point camera at a dog...";
 NSMutableArray *labelLayers;
 
 -(id)init
@@ -32,7 +33,7 @@ NSMutableArray *labelLayers;
     }
     else {    // No dog detected
         [self removeAllLabelLayers];
-        [self addLabelToViewLeftCorner:self.ViewToDraw label:@"Point camera at a dog..."];
+        [self addLabelToViewLeftCorner:self.ViewToDraw label:pointCamera];
     }
 }
 
@@ -41,6 +42,13 @@ NSMutableArray *labelLayers;
         [layer removeFromSuperlayer];
     }
     [labelLayers removeAllObjects];
+}
+
+-(void) cleanAllLabels
+{
+    [self.CleanedPredictions removeAllObjects];
+    [self removeAllLabelLayers];
+    [self addLabelToViewLeftCorner:self.ViewToDraw label:pointCamera];
 }
 
 -(void) drawModelForSharing

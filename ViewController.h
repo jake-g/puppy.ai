@@ -13,7 +13,8 @@
   IBOutlet UIButton *feedbackButton;
   IBOutlet UIImageView *dogImageView;
   IBOutlet UIButton *shareButton;
-  
+  IBOutlet UIButton *refreshButton;
+        
   UIImage *square;
 
   PAICNNRunner *cNNRunner;

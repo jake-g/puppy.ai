@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" colorMatched="YES" initialViewController="2">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" colorMatched="YES" initialViewController="2">
     <device id="retina4_0" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -76,6 +76,19 @@
                                     <action selector="share:" destination="2" eventType="touchDown" id="rYA-D6-v3v"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Buw-xu-krm">
+                                <rect key="frame" x="249" y="522" width="55" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <accessibility key="accessibilityConfiguration" label="Share">
+                                    <bool key="isElement" value="YES"/>
+                                </accessibility>
+                                <state key="normal" title="Refresh">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="refresh:" destination="2" eventType="touchDown" id="YOM-NJ-bWF"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
@@ -83,6 +96,7 @@
                         <outlet property="dogImageView" destination="8T8-dR-gA8" id="0pK-fT-zbU"/>
                         <outlet property="feedbackButton" destination="5Ti-my-AcL" id="u7T-gj-eAA"/>
                         <outlet property="previewView" destination="12" id="13"/>
+                        <outlet property="refreshButton" destination="Buw-xu-krm" id="kU6-Wj-3YP"/>
                         <outlet property="shareButton" destination="Er0-ct-6jB" id="xwj-TJ-cE5"/>
                         <outlet property="swapCameraButton" destination="gYj-qP-ecG" id="ORg-DJ-sZN"/>
                     </connections>

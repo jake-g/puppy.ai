@@ -6,4 +6,5 @@
 @property (copy) NSMutableArray *CleanedPredictions;
 -(void) drawModelWith: (NSArray*)Predictions;
 -(void) drawModelForSharing;
+-(void) cleanAllLabels;
 @end

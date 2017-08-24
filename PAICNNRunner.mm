@@ -21,11 +21,8 @@ static NSMutableDictionary *oldPredictionValues = nil;
 -(id)init
 {
     self = [super init];
-    if (oldPredictionValues==nil)
-    {
-        oldPredictionValues = [[NSMutableDictionary alloc] init];
-    }
-    
+    oldPredictionValues = [[NSMutableDictionary alloc] init];
+        
     tensorflow::Status load_status;
     if (model_uses_memory_mapping) {
         load_status = LoadMemoryMappedModel(
