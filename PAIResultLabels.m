@@ -1,6 +1,7 @@
 #import "PAIResultLabels.h"
 
 @implementation PAIResultLabels
+const int n_labels = 1; // number of labels to show
 const float colMargin = 0;
 const float rowMargin = 0;
 const float rowHeight = 26.0f;  // header, label and value height
@@ -80,7 +81,7 @@ NSMutableArray *labelLayers;
         
         // Limit # labels to display
         labelCount += 1;
-        if (labelCount > 1) {
+        if (labelCount > n_labels) {
             break;
         }
     }
