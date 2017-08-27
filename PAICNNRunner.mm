@@ -18,6 +18,9 @@ const std::string input_layer_name = "Mul";
 const std::string output_layer_name = "final_result";
 static NSMutableDictionary *oldPredictionValues = nil;
 static NSMutableDictionary *labelCumSum = nil;
+int missedFrames = 0; // n frames with low confidence
+
+
 
 -(id)init
 {
@@ -154,9 +157,15 @@ static NSMutableDictionary *labelCumSum = nil;
 
 - (NSArray*)setPredictionValues:(NSDictionary *)newValues
 {
-        const float decayValue = 0.75f;  // how fast predictions decay
-        const float updateValue = 0.25f;
+        const int maxMissedFrames = 5;  // n consecutive frames with low
+                                        // confidence to trigger reset
+                                        // Note ~2.5 frames per second as of 8-2017
+  
+        // should sum to 1
+        const float decayValue = 0.6f;  // low=fast decay
+        const float updateValue = 0.4f; // low=slow increase
         const float minimumThreshold = 0.01f;
+        const float minPredictionValue = 0.05f;
         
         NSMutableDictionary *decayedPredictionValues =
         [[NSMutableDictionary alloc] init];
@@ -195,7 +204,7 @@ static NSMutableDictionary *labelCumSum = nil;
             NSNumber *oldPredictionValueObject =
             [oldPredictionValues objectForKey:label];
             const float oldPredictionValue = [oldPredictionValueObject floatValue];
-            if (oldPredictionValue > 0.025f) {
+            if (oldPredictionValue > minPredictionValue) {
               
                 // Track cumulative sum
                 NSNumber *sumObj = [labelCumSum objectForKey:label];
@@ -209,9 +218,7 @@ static NSMutableDictionary *labelCumSum = nil;
                   [labelCumSum setObject:sumObj forKey:label];
 
                 }
-              
                 NSLog(@", %@, %f, %@", label, oldPredictionValue, sumObj);
-
                 NSDictionary *entry = @{
                                         @"label" : label,
                                         @"value" : oldPredictionValueObject
@@ -220,13 +227,17 @@ static NSMutableDictionary *labelCumSum = nil;
             }
         }
   
-        // Reset sum if no labels are detected
-        // TODO not workin, need to reset sums
-        
-//        if ([candidateLabels count] == 0) {
-//          labelCumSum = [[NSMutableDictionary alloc] init];
-//
-//        }
+//        // Reset sum if no labels are detected
+        if ([candidateLabels count] == 0 && [labelCumSum count] > 0) {
+          missedFrames += 1;
+          NSLog(@"missed %d", missedFrames);
+          if (missedFrames >= maxMissedFrames) { // reset cumsum
+            NSLog(@"\n\n\n------------------------------\nRESET\n\n\n\n");
+            labelCumSum = [[NSMutableDictionary alloc] init];
+            missedFrames = 0;
+          }
+        }
+        // n_frames += 1
         return candidateLabels;
 }
 
