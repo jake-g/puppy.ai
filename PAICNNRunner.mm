@@ -6,9 +6,9 @@ static NSString* model_file_type = @"pb"; // input type
 static NSString* labels_file_name = @"retrained_labels";  // labels file
 static NSString* labels_file_type = @"txt";
 
-
-const bool model_uses_memory_mapping = true;
+// CNN model params
 // These dimensions need to match those the model was trained with.
+const bool model_uses_memory_mapping = true;
 const int wanted_input_width = 299;
 const int wanted_input_height = 299;
 const int wanted_input_channels = 3;
@@ -17,8 +17,23 @@ const float input_std = 128.0f;
 const std::string input_layer_name = "Mul";
 const std::string output_layer_name = "final_result";
 
+/*  Label Scoring Algotithm
+  Every time the CNN outputs a prediction on a new frame, labels with values > minPredictionValue
+  are displayed and the cumulative sum dict is updated with the total sum of values for that label
+  
+  - if there all values < minPredictionValue, no dog detected and voteCount += 1
+  - if the cumulative sum for a label > maxSum, that label is selected and voteCount += 1
+  - once voteCount > maxVoteCount, the cumulative sum dict resets
+  
+  Note: currently since the view doesnt change when the final label is chosen, the scores just reset,
+      What SHOULD happen is in the PAIResultLabels, when a label has 100%, switch to the Final Display
+      and show some dog facts and a reset button
+*/
+
+// Label Scoring params
 static NSMutableDictionary *oldPredictionValues = nil;
 static NSMutableDictionary *labelCumSum = nil;
+const float maxSum = 2.5; // when cumulative sum is > maxSum, that labem is choosen
 const int maxVoteCount = 5;  // number of votes to reset score metrics
 int voteCount = 0; // counts frames where prediction is not necessary
                    // (if no dog present OR final prediction has been made
@@ -204,14 +219,14 @@ int voteCount = 0; // counts frames where prediction is not necessary
               
                 // Track cumulative sum
                 NSNumber *sumObj = [labelCumSum objectForKey:label];
-                if (sumObj == nil) {
+                if (sumObj == nil) {  // start cumulative sum
                   sumObj = [NSNumber numberWithFloat:0];
                   [labelCumSum setObject:oldPredictionValueObject forKey:label];
-                } else if ([sumObj floatValue] > 2.5) {
+                } else if ([sumObj floatValue] > maxSum) { // set final prediction
                   oldPredictionValue = 1.0; // reset
                   oldPredictionValueObject = [NSNumber numberWithFloat:1.0];
                   voteCount += 1;
-                } else {
+                } else {  // increment cumulative sum
                   const float oldSum = [sumObj floatValue];
                   const float newSum = oldPredictionValue + oldSum;
                   sumObj = [NSNumber numberWithFloat:newSum];
@@ -219,6 +234,8 @@ int voteCount = 0; // counts frames where prediction is not necessary
 
                 }
                 // NSLog(@", %@, %f, %@", label, oldPredictionValue, sumObj);
+              
+                // Store current label and score value
                 NSDictionary *entry = @{
                                         @"label" : label,
                                         @"value" : oldPredictionValueObject
@@ -238,7 +255,7 @@ int voteCount = 0; // counts frames where prediction is not necessary
           labelCumSum = [[NSMutableDictionary alloc] init];
           voteCount = 0;
         }
-          return candidateLabels;
+    return candidateLabels;
 }
 
 @end
