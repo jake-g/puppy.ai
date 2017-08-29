@@ -16,11 +16,12 @@ const float input_mean = 128.0f;
 const float input_std = 128.0f;
 const std::string input_layer_name = "Mul";
 const std::string output_layer_name = "final_result";
+
 static NSMutableDictionary *oldPredictionValues = nil;
 static NSMutableDictionary *labelCumSum = nil;
-int missedFrames = 0; // n frames with low confidence
-
-
+const int maxVoteCount = 5;  // number of votes to reset score metrics
+int voteCount = 0; // counts frames where prediction is not necessary
+                   // (if no dog present OR final prediction has been made
 
 -(id)init
 {
@@ -155,9 +156,6 @@ int missedFrames = 0; // n frames with low confidence
 
 - (NSArray*)setPredictionValues:(NSDictionary *)newValues
 {
-        const int maxMissedFrames = 3;  // n consecutive frames with low
-                                        // confidence to trigger reset
-                                        // Note ~2.5 frames per second as of 8-2017
   
         // should sum to 1
         const float decayValue = 0.6f;  // low=fast decay
@@ -197,7 +195,6 @@ int missedFrames = 0; // n frames with low confidence
             [NSNumber numberWithFloat:updatedPredictionValue];
             [oldPredictionValues setObject:updatedPredictionValueObject forKey:label];
         }
-        bool DONE = false;
         NSArray *candidateLabels = [NSMutableArray array];
         for (NSString *label in oldPredictionValues) {
             NSNumber *oldPredictionValueObject =
@@ -213,7 +210,7 @@ int missedFrames = 0; // n frames with low confidence
                 } else if ([sumObj floatValue] > 2.5) {
                   oldPredictionValue = 1.0; // reset
                   oldPredictionValueObject = [NSNumber numberWithFloat:1.0];
-//                  DONE = true;
+                  voteCount += 1;
                 } else {
                   const float oldSum = [sumObj floatValue];
                   const float newSum = oldPredictionValue + oldSum;
@@ -232,17 +229,14 @@ int missedFrames = 0; // n frames with low confidence
   
         // Reset sum if no labels are detected
         if ([candidateLabels count] == 0 && [labelCumSum count] > 0) {
-          DONE = true;
+//                  NSLog(@"reset votes, %d, -1", voteCount);
+          voteCount += 1;
         }
   
-        if (DONE) {
-          missedFrames += 1;
-          NSLog(@"missed, %d, -1", missedFrames);
-          if (missedFrames >= maxMissedFrames) { // reset cumSum
+        if (voteCount >= maxVoteCount) { // enough reset votes...reset
 //            NSLog(@"\n\n\n------------------------------\nRESET\n\n\n\n");
-            labelCumSum = [[NSMutableDictionary alloc] init];
-            missedFrames = 0;
-          }
+          labelCumSum = [[NSMutableDictionary alloc] init];
+          voteCount = 0;
         }
   
         // n_frames += 1
