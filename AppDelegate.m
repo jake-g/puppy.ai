@@ -21,6 +21,20 @@
 - (BOOL)application:(UIApplication *)application
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   [self.window makeKeyAndVisible];
+  
+////   Log printf statements stdout (append) into app documents 'log.txt'
+//// UNCOMMENT TO LOG NSLOG TO 'log.txt' for debug
+//  #ifdef DEBUG  // only do it if debug and non simulator
+//   #if TARGET_IPHONE_SIMULATOR == 0
+//      #define NSLog(FORMAT, ...) printf("%s\n", [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
+//
+//      NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+//      NSString *documentsDirectory = [paths objectAtIndex:0];
+//      NSString *logPath = [documentsDirectory stringByAppendingPathComponent:@"log.txt"];
+//      freopen([logPath cStringUsingEncoding:NSASCIIStringEncoding],"w+",stderr);
+//   #endif
+//  #endif
+
   return YES;
 }
 
