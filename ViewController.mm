@@ -22,6 +22,7 @@ UIImage* currentImage = nil;
        [sender setTitle:@"Continue" forState:UIControlStateNormal];
        swapCameraButton.hidden = TRUE;
        feedbackButton.hidden = FALSE;
+       refreshButton.hidden = TRUE;
        
        if (resultsLabels.CleanedPredictions.count>0) {
            shareButton.hidden = FALSE;
@@ -37,6 +38,7 @@ UIImage* currentImage = nil;
        swapCameraButton.hidden = FALSE;
        feedbackButton.hidden = TRUE;
        shareButton.hidden = TRUE;
+       refreshButton.hidden = FALSE;
    }
 }
 
@@ -109,6 +111,15 @@ UIImage* currentImage = nil;
     sharingModule.Url = [[NSURL alloc] initWithString:@"https://puppyai.github.io"];
     [sharingModule share];
     dogImageView.hidden = TRUE;
+}
+
+//restart CNN and clean labels
+- (IBAction)refresh:(id)sender {
+    [videoPRocessing PauseAVCapture];
+    [resultsLabels cleanAllLabels];
+    cNNRunner = nil;
+    cNNRunner = [[PAICNNRunner alloc] init];
+    [videoPRocessing ResumeAVCapture];
 }
 
 //standart overiddes

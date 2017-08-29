@@ -25,12 +25,9 @@ int missedFrames = 0; // n frames with low confidence
 -(id)init
 {
     self = [super init];
-    if (oldPredictionValues==nil || labelCumSum==nil)
-    {
-        oldPredictionValues = [[NSMutableDictionary alloc] init];
-        labelCumSum = [[NSMutableDictionary alloc] init];
-    }
-    
+    oldPredictionValues = [[NSMutableDictionary alloc] init];
+    labelCumSum = [[NSMutableDictionary alloc] init];
+
     tensorflow::Status load_status;
     if (model_uses_memory_mapping) {
         load_status = LoadMemoryMappedModel(
