@@ -80,11 +80,11 @@ NSMutableArray *labelLayers;
         NSNumber *valueObject = [entry objectForKey:@"value"];
         const float value = [valueObject floatValue];
         const int valuePercentage = (int)roundf(value * 100.0f);
-//        NSLog(@", %@, %f", label, value);
+        // NSLog(@", %@, %f", label, value);
       
         // Display final prediction and break
         if (valuePercentage == 100) {
-//          NSLog(@"Final prediction: %@", label);
+          // NSLog(@"Final prediction: %@", label);
           [self addFinalPredictionToView:self.ViewToDraw label:label];
           break;
         }
@@ -200,10 +200,6 @@ NSMutableArray *labelLayers;
                       alignment:kCAAlignmentLeft
                            view:view];
 }
-
-
-
-
 
 -(void)addFooterToView:(UIView*) view
                  value: (NSString*) valueText

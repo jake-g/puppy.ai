@@ -218,7 +218,7 @@ int voteCount = 0; // counts frames where prediction is not necessary
                   [labelCumSum setObject:sumObj forKey:label];
 
                 }
-                NSLog(@", %@, %f, %@", label, oldPredictionValue, sumObj);
+                // NSLog(@", %@, %f, %@", label, oldPredictionValue, sumObj);
                 NSDictionary *entry = @{
                                         @"label" : label,
                                         @"value" : oldPredictionValueObject
@@ -229,18 +229,16 @@ int voteCount = 0; // counts frames where prediction is not necessary
   
         // Reset sum if no labels are detected
         if ([candidateLabels count] == 0 && [labelCumSum count] > 0) {
-//                  NSLog(@"reset votes, %d, -1", voteCount);
+          // NSLog(@"reset votes, %d, -1", voteCount);
           voteCount += 1;
         }
   
         if (voteCount >= maxVoteCount) { // enough reset votes...reset
-//            NSLog(@"\n\n\n------------------------------\nRESET\n\n\n\n");
+          // NSLog(@"\n\n\n\nRESET\n\n\n\n");
           labelCumSum = [[NSMutableDictionary alloc] init];
           voteCount = 0;
         }
-  
-        // n_frames += 1
-        return candidateLabels;
+          return candidateLabels;
 }
 
 @end
