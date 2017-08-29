@@ -71,18 +71,20 @@ NSMutableArray *labelLayers;
         NSNumber *valueObject = [entry objectForKey:@"value"];
         const float value = [valueObject floatValue];
         
-        
         const int valuePercentage = (int)roundf(value * 100.0f);
-        NSString *valueText = [NSString stringWithFormat:@"%d%%", valuePercentage];
-        NSArray *prediction = [[NSArray alloc] initWithObjects:label,valueText,nil];
-        [self.CleanedPredictions addObject:prediction];
-        
-        [self addLabelsToView:self.ViewToDraw label:label value:valueText count:labelCount];
-        
-        // Limit # labels to display
-        labelCount += 1;
-        if (labelCount > n_labels) {
-            break;
+        if (valuePercentage == 100) {
+          [self addPredictionToView:self.ViewToDraw label:label];
+        } else {
+          NSString *valueText = [NSString stringWithFormat:@"%d%%", valuePercentage];
+          NSArray *prediction = [[NSArray alloc] initWithObjects:label,valueText,nil];
+          [self.CleanedPredictions addObject:prediction];
+          [self addLabelsToView:self.ViewToDraw label:label value:valueText count:labelCount];
+          
+          // Limit # labels to display
+          labelCount += 1;
+          if (labelCount > n_labels) {
+              break;
+          }
         }
     }
 }
@@ -152,6 +154,21 @@ NSMutableArray *labelLayers;
                          height:rowHeight
                        fontSize:fontSize
                       alignment:kCAAlignmentLeft
+                           view:view];
+}
+
+-(void)addPredictionToView:(UIView*) view
+                 label:(NSString*) label
+
+{
+    [self addLabelLayerWithText:[label capitalizedString]
+                           font:defaultLabelFont
+                        originX:colMargin
+                        originY:entryMargin + rowHeight
+                          width:labelWidth
+                         height:rowHeight
+                       fontSize:20
+                      alignment:kCAAlignmentCenter
                            view:view];
 }
 
