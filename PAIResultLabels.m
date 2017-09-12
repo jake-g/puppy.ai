@@ -8,10 +8,10 @@ const float rowHeight = 26.0f;  // header, label and value height
 const float entryMargin = rowMargin + rowHeight;
 const float fontSize = 16.0f;
 const float valueWidth = 100.0f;
-const float labelWidth = 2000.0f;  // TODO need to get width from os?
+float labelWidth;
 
 const float finalFontSize = 2*fontSize;  // larger
-const float finalValueMargin = 55.0f; // more room for label
+const float finalValueMargin = 0.5f; // more room for label
 const float finalRowHeight = 2*rowHeight;  // header, label and value height
 
 NSString *defaultLabelFont = @"Helvetica Neue-Regular";
@@ -24,23 +24,27 @@ NSMutableArray *labelLayers;
 
 -(id)init
 {
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    labelWidth = screenRect.size.width;
     self = [super init];
     labelLayers = [[NSMutableArray alloc] init];
     _CleanedPredictions = [[NSMutableArray alloc] init];
     return self;
 }
 
+
 -(void) drawModelWith: (NSMutableArray*)Predictions
 {
-    if ([Predictions count] > 0) {
-        [self removeAllLabelLayers];
-        int labelCount = 0;
-        [self drawPredictions:labelCount Predictions:Predictions];
-
-    }
-    else {    // No dog detected
-        [self removeAllLabelLayers];
-        [self addLabelToViewLeftCorner:self.ViewToDraw label:pointCamera];
+    if (self.isFinalPredictions == NO) {
+        if ([Predictions count] > 0) {
+            [self removeAllLabelLayers];
+            int labelCount = 0;
+            [self drawPredictions:labelCount Predictions:Predictions];
+        }
+        else {    // No dog detected
+            [self removeAllLabelLayers];
+            [self addLabelToViewLeftCorner:self.ViewToDraw label:pointCamera];
+        }
     }
 }
 
@@ -60,14 +64,25 @@ NSMutableArray *labelLayers;
 
 -(void) drawModelForSharing
 {
-    if (self.CleanedPredictions.count==2) {
+    if (self.isFinalPredictions) {
+        [self addFinalPredictionToView:self.ViewToDraw label:self.CleanedPredictions[0][0]];
+    } else if (self.CleanedPredictions.count>0) {
         [self addHeaderToView:self.ViewToDraw];
-        [self addLabelsToView:self.ViewToDraw label:self.CleanedPredictions[0][0] value:self.CleanedPredictions[0][1]  count:0];
-        [self addLabelsToView:self.ViewToDraw label:self.CleanedPredictions[1][0] value:self.CleanedPredictions[1][1]  count:1];
+        int labelCounter = 0;
+        for (NSArray *entry in self.CleanedPredictions) {
+            [self addLabelsToView:self.ViewToDraw label: entry[0] value: entry[1]  count:labelCounter];
+            ++labelCounter;
+        }
     } else {
         [self addLabelToViewLeftCorner:self.ViewToDraw label:@"There are no dog detected"];
     }
     [self addFooterToView:self.ViewToDraw value:@"You can do it too. Discover any dog's breed: https://puppyai.github.io"];
+}
+
+-(void) drawFinalView: (NSString*)Prediction
+{
+    [self removeAllLabelLayers];
+    [self addFinalPredictionToView:self.ViewToDraw label:Prediction];
 }
 
 - (void)drawPredictions:(int)labelCount Predictions:(NSMutableArray *)Predictions
@@ -80,14 +95,6 @@ NSMutableArray *labelLayers;
         NSNumber *valueObject = [entry objectForKey:@"value"];
         const float value = [valueObject floatValue];
         const int valuePercentage = (int)roundf(value * 100.0f);
-        // NSLog(@", %@, %f", label, value);
-      
-        // Display final prediction and break
-        if (valuePercentage == 100) {
-          // NSLog(@"Final prediction: %@", label);
-          [self addFinalPredictionToView:self.ViewToDraw label:label];
-          break;
-        }
       
         // Display current prediction
         // Add header
@@ -137,15 +144,6 @@ NSMutableArray *labelLayers;
                           label:(NSString*) label
 {   // Displays when final prediction is decided
     // Spacer...TODO better way to do this
-    [self addLabelLayerWithText:@""
-                           font:BoldLabelFont
-                        originX:colMargin
-                        originY:rowMargin
-                          width:finalValueMargin
-                         height:finalRowHeight
-                       fontSize:finalFontSize
-                      alignment:kCAAlignmentRight
-                           view:view];
     [self addLabelLayerWithText:[label capitalizedString]
                            font:BoldLabelFont
                         originX:finalValueMargin
@@ -153,7 +151,7 @@ NSMutableArray *labelLayers;
                           width:labelWidth
                          height:finalRowHeight
                        fontSize:finalFontSize
-                      alignment:kCAAlignmentLeft
+                      alignment:kCAAlignmentCenter
                            view:view];
 }
 

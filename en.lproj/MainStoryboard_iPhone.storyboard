@@ -95,6 +95,7 @@
                     <connections>
                         <outlet property="dogImageView" destination="8T8-dR-gA8" id="0pK-fT-zbU"/>
                         <outlet property="feedbackButton" destination="5Ti-my-AcL" id="u7T-gj-eAA"/>
+                        <outlet property="freezeButton" destination="5Rz-AS-r7C" id="aeA-Fr-FvG"/>
                         <outlet property="previewView" destination="12" id="13"/>
                         <outlet property="refreshButton" destination="Buw-xu-krm" id="kU6-Wj-3YP"/>
                         <outlet property="shareButton" destination="Er0-ct-6jB" id="xwj-TJ-cE5"/>

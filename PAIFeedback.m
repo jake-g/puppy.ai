@@ -92,7 +92,7 @@ NSDictionary* deviceNamesByCode = nil;
     NSString *appVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
     NSString *buildNumber = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
     
-    if (self.ModelPredictions.count ==2)
+    if (self.ModelPredictions.count > 1)
     {
         return [NSString stringWithFormat:self.ReportTemplate,self.ModelPredictions[0][0],self.ModelPredictions[0][1],
                 self.ModelPredictions[1][0],self.ModelPredictions[1][1], deviceModel,OSName,OSVersion,appVersion,buildNumber];

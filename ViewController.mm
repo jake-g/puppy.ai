@@ -19,27 +19,36 @@ UIImage* currentImage = nil;
    {
        [videoPRocessing PauseAVCapture];
        
-       [sender setTitle:@"Continue" forState:UIControlStateNormal];
-       swapCameraButton.hidden = TRUE;
-       feedbackButton.hidden = FALSE;
-       refreshButton.hidden = TRUE;
-       
-       if (resultsLabels.CleanedPredictions.count>0) {
-           shareButton.hidden = FALSE;
-       }
-    
-       dogImageView.image = currentImage;
+       [self enableSharing];
+
    }
    else
    {
-       [videoPRocessing ResumeAVCapture];
-       
        [sender setTitle:@"Freeze" forState:UIControlStateNormal];
        swapCameraButton.hidden = FALSE;
        feedbackButton.hidden = TRUE;
        shareButton.hidden = TRUE;
        refreshButton.hidden = FALSE;
+       if ([resultsLabels isFinalPredictions]) {
+           [self restartCNN];
+           resultsLabels.isFinalPredictions = NO;
+       }
+       
+       [videoPRocessing ResumeAVCapture];
    }
+}
+
+-(void) enableSharing
+{
+    [freezeButton setTitle:@"Continue" forState:UIControlStateNormal];
+    swapCameraButton.hidden = TRUE;
+    feedbackButton.hidden = FALSE;
+    refreshButton.hidden = TRUE;
+    
+    if (resultsLabels.CleanedPredictions.count>0) {
+        shareButton.hidden = FALSE;
+    }
+    dogImageView.image = currentImage;
 }
 
 //run convnet on given frame
@@ -52,7 +61,20 @@ UIImage* currentImage = nil;
         NSArray *sortedLabels = [candidateLabels
                                  sortedArrayUsingDescriptors:[NSArray arrayWithObject:sort]];
         resultsLabels.ViewToDraw = self.view;
-        [resultsLabels drawModelWith:sortedLabels];
+        
+        if ([sortedLabels count] > 0) {
+            float certainityValue = [[sortedLabels[0] objectForKey:@"value"] floatValue];
+            if (certainityValue == 1.0) {
+                [videoPRocessing PauseAVCapture];
+                resultsLabels.isFinalPredictions = YES;
+                [self enableSharing];
+                [resultsLabels drawFinalView:[sortedLabels[0] objectForKey:@"label"]];
+                } else {
+                [resultsLabels drawModelWith:sortedLabels];
+            }
+        } else {
+            [resultsLabels drawModelWith:sortedLabels];
+        }
     }];
 }
 
@@ -70,7 +92,7 @@ UIImage* currentImage = nil;
     feedbackModule.ModelPredictions = resultsLabels.CleanedPredictions;
     feedbackModule.DogImage = dogImageView.image;
     feedbackModule.parentViewConstroller = self;
-    if (resultsLabels.CleanedPredictions.count==2) {
+    if (resultsLabels.CleanedPredictions.count>1) {
         feedbackModule.ReportTemplate =
         @"<html>"
         @"<body>"
@@ -117,9 +139,13 @@ UIImage* currentImage = nil;
 - (IBAction)refresh:(id)sender {
     [videoPRocessing PauseAVCapture];
     [resultsLabels cleanAllLabels];
+    [self restartCNN];
+    [videoPRocessing ResumeAVCapture];
+}
+
+-(void) restartCNN {
     cNNRunner = nil;
     cNNRunner = [[PAICNNRunner alloc] init];
-    [videoPRocessing ResumeAVCapture];
 }
 
 //standart overiddes

@@ -14,7 +14,7 @@
   IBOutlet UIImageView *dogImageView;
   IBOutlet UIButton *shareButton;
   IBOutlet UIButton *refreshButton;
-        
+  IBOutlet UIButton *freezeButton;
   UIImage *square;
 
   PAICNNRunner *cNNRunner;
