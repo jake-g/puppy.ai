@@ -1,7 +1,7 @@
 #import "PAIResultLabels.h"
 
 @implementation PAIResultLabels
-const int n_labels = 3; // number of labels to show
+const int n_labels = 5; // number of labels to show
 const float colMargin = 0;
 const float rowMargin = 0;
 const float rowHeight = 26.0f;  // header, label and value height
