@@ -24,8 +24,6 @@ NSMutableArray *labelLayers;
 
 -(id)init
 {
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    labelWidth = screenRect.size.width;
     self = [super init];
     labelLayers = [[NSMutableArray alloc] init];
     _CleanedPredictions = [[NSMutableArray alloc] init];
@@ -35,6 +33,8 @@ NSMutableArray *labelLayers;
 
 -(void) drawModelWith: (NSMutableArray*)Predictions
 {
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    labelWidth = screenRect.size.width;
     if (self.isFinalPredictions == NO) {
         if ([Predictions count] > 0) {
             [self removeAllLabelLayers];
@@ -143,14 +143,32 @@ NSMutableArray *labelLayers;
 -(void)addFinalPredictionToView:(UIView*)view
                           label:(NSString*) label
 {   // Displays when final prediction is decided
-    // Spacer...TODO better way to do this
-    [self addLabelLayerWithText:[label capitalizedString]
+    NSString *capitalizedLabel = [label capitalizedString];
+    UIFont *finalLabelFont = [UIFont fontWithName:BoldLabelFont size:finalFontSize];
+    NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithObjectsAndKeys:finalLabelFont, NSFontAttributeName, nil];
+    NSMutableAttributedString *attribute_Label = [[NSMutableAttributedString alloc] initWithString:capitalizedLabel attributes:attributes];
+    float currentLabelWidth = attribute_Label.size.width;
+    
+    float currentFontSize = finalFontSize;
+    float totallabelWidth = labelWidth - 10;
+    while (currentLabelWidth > totallabelWidth) {
+        finalLabelFont = nil;
+        --currentFontSize;
+        finalLabelFont = [UIFont fontWithName:BoldLabelFont size:currentFontSize];
+        attributes[NSFontAttributeName] = finalLabelFont;
+        attribute_Label = nil;
+        attribute_Label = [[NSMutableAttributedString alloc] initWithString:capitalizedLabel attributes:attributes];
+        currentLabelWidth = attribute_Label.size.width;
+    }
+    
+        
+    [self addLabelLayerWithText:capitalizedLabel
                            font:BoldLabelFont
                         originX:finalValueMargin
                         originY:rowMargin
                           width:labelWidth
                          height:finalRowHeight
-                       fontSize:finalFontSize
+                       fontSize:currentFontSize
                       alignment:kCAAlignmentCenter
                            view:view];
 }
