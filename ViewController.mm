@@ -40,7 +40,7 @@ UIImage* currentImage = nil;
 
 -(void) enableSharing
 {
-    [freezeButton setTitle:@"Continue" forState:UIControlStateNormal];
+    [freezeButton setTitle:@"Restart" forState:UIControlStateNormal];
     swapCameraButton.hidden = TRUE;
     feedbackButton.hidden = FALSE;
     refreshButton.hidden = TRUE;

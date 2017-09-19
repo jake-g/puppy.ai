@@ -176,7 +176,7 @@ int voteCount = 0; // counts frames where prediction is not necessary
         const float decayValue = 0.6f;  // low=fast decay
         const float updateValue = 0.4f; // low=slow increase
         const float minimumThreshold = 0.01f;
-        const float minPredictionValue = 0.05f;
+        const float minPredictionValue = 0.5f;
         
         NSMutableDictionary *decayedPredictionValues =
         [[NSMutableDictionary alloc] init];
