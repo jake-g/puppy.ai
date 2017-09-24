@@ -24,7 +24,7 @@ UIImage* currentImage = nil;
    }
    else
    {
-       [sender setTitle:@"Freeze" forState:UIControlStateNormal];
+       [sender setTitle:@"Stop" forState:UIControlStateNormal];
        swapCameraButton.hidden = FALSE;
        feedbackButton.hidden = TRUE;
        shareButton.hidden = TRUE;
