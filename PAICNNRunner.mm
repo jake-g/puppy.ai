@@ -34,7 +34,7 @@ const std::string output_layer_name = "final_result";
 static NSMutableDictionary *oldPredictionValues = nil;
 static NSMutableDictionary *labelCumSum = nil;
 const float maxSum = 2.5; // when cumulative sum is > maxSum, that labem is choosen
-const int maxVoteCount = 5;  // number of votes to reset score metrics
+const int maxVoteCount = 8;  // number of votes to reset score metrics
 int voteCount = 0; // counts frames where prediction is not necessary
                    // (if no dog present OR final prediction has been made
 
@@ -172,11 +172,11 @@ int voteCount = 0; // counts frames where prediction is not necessary
 - (NSArray*)setPredictionValues:(NSDictionary *)newValues
 {
   
-        // should sum to 1
+        // decay and update should sum to 1
         const float decayValue = 0.6f;  // low=fast decay
         const float updateValue = 0.4f; // low=slow increase
         const float minimumThreshold = 0.01f;
-        const float minPredictionValue = 0.05f;
+        const float minPredictionValue = 0.12f;
         
         NSMutableDictionary *decayedPredictionValues =
         [[NSMutableDictionary alloc] init];
