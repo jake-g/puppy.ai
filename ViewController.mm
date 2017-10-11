@@ -103,7 +103,19 @@ UIImage* currentImage = nil;
         @"</body>"
         @"</html>";
         
-    } else {
+    }
+    else if (resultsLabels.CleanedPredictions.count==1) {
+        feedbackModule.ReportTemplate =
+        @"<html>"
+        @"<body>"
+        @"<p>Hi puppy.ai team,</p>"
+        @"<p>I have used your app to determine the breed of the dog shown below.</p>"
+        @"<p>puppy.ai thinks that it is a %@ with %@ certainty, but actually the dog breed is ...</p>"
+        @"<p>%@ | %@ version: %@ | puppy.ai version: %@ | build: %@</p>"
+        @"</body>"
+        @"</html>";
+    }
+    else {
         feedbackModule.ReportTemplate =  @"<html>"
         @"<body>"
         @"<p>Hi puppy.ai team,</p>"

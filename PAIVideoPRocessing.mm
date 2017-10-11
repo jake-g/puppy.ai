@@ -145,7 +145,7 @@ BOOL isUsingFrontFacingCamera = NO;
                       ofObject:(id)object
                         change:(NSDictionary *)change
                        context:(void *)context {
-    if (context == AVCaptureStillImageIsCapturingStillImageContext) {
+    if ((NSString*)context == AVCaptureStillImageIsCapturingStillImageContext) {
         BOOL isCapturingStillImage =
         [[change objectForKey:NSKeyValueChangeNewKey] boolValue];
         
