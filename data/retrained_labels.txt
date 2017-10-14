@@ -1,176 +1,40 @@
-dogue de bordeaux
-rottweiler
-chow chow
-belgian sheepdog
-australian shepherd
-bichon frise
-saint bernard
-standard poodle
-anatolian shepherd dog
-brussels griffon
-giant schnauzer
-chihuahua
-american foxhound
-weimaraner
-smooth fox terrier
-cocker spaniel
-basenji
-beagle
-border terrier
-flat coated retriever
-beauceron
-brabancon griffon
-golden retriever
-glen of imaal terrier
-airedale terrier
-lowchen
-toy poodle
-norwegian buhund
-clumber spaniel
-boxer
-japanese chin
-vizsla
-old english sheepdog
-welsh springer spaniel
-great pyrenees
-border collie
-toy terrier
-american bulldog
-dingo
-french bulldog
-borzoi
-curly coated retriever
-black and tan coonhound
-keeshond
-manchester terrier
-pembroke welsh corgi
-australian terrier
-parson russell terrier
-shetland sheepdog
-chinese shar pei
-german shorthaired pointer
-tibetan terrier
-briard
-english springer spaniel
-wire haired fox terrier
-groenendael
-samoyed
-australian cattle dog
-cane corso
-icelandic sheepdog
-whippet
-saluki
-english bulldog
-malinois
-kuvasz
-dandie dinmont terrier
-lhasa apso
-appenzeller
-norfolk terrier
-field spaniel
-schipperke
-pomeranian
-bull terrier
-pug
-blenheim spaniel
-bernese mountain dog
-wirehaired pointing griffon
-papillon
-canaan dog
-dalmatian
-havanese
-plott
-neapolitan mastiff
-bloodhound
-bedlington terrier
-boston terrier
-mastiff
-brittany
-dhole
-miniature poodle
-affenpinscher
-redbone
-irish terrier
-german shepherd dog
-sussex spaniel
-lakeland terrier
-silky terrier
-yorkshire terrier
-sealyham terrier
-belgian malinois
-chinese crested
-maltese
-dachshund
-irish wolfhound
-entlebucher mountain dog
-english cocker spaniel
-standard schnauzer
-belgian tervuren
-finnish spitz
-mexican hairless
-english toy spaniel
-petit basset griffon vendeen
-siberian husky
-cairn terrier
-english setter
-kelpie
-greyhound
-english foxhound
-afghan hound
-nova scotia duck tolling retriever
-american staffordshire terrier
-irish setter
-labradoodle
-boston bull
-norwegian lundehund
-ibizan hound
-american water spaniel
-labrador retriever
-basset hound
-shiba inu
-german wirehaired pointer
-newfoundland
-rhodesian ridgeback
-west highland white terrier
-bouvier des flandres
-irish water spaniel
-greater swiss mountain dog
-staffordshire bullterrier
-akita
-great dane
-kerry blue terrier
-scotch terrier
-gordon setter
-alaskan malamute
-pointer
-collie
-leonberger
-pekingese
-portuguese water dog
-italian greyhound
-chesapeake bay retriever
-norwich terrier
-bearded collie
-doberman pinscher
-african hunting dog
-miniature schnauzer
-black russian terrier
-boykin spaniel
-bullmastiff
-pharaoh hound
-irish red and white setter
-cavalier king charles spaniel
-bluetick coonhound
-xoloitzcuintli
-soft coated wheaten terrier
-tibetan mastiff
-miniature pinscher
-german pinscher
-shih tzu
-norwegian elkhound
-scottish deerhound
-walker hound
-komondor
-otterhound
-cardigan welsh corgi
-american eskimo dog
+lg g3
+lg g5
+samsung galaxy s5
+samsung galaxy s6
+samsung galaxy s7
+samsung galaxy s8
+nexus 5x
+iphone 7
+iphone 6
+iphone 5
+iphone 4
+lg g4
+huawei mate 9
+huawei mate 8
+nexus 6
+xiaomi mi 5
+nexus 4
+nexus 5
+lg v20
+lg g6
+huawei mate 7
+htc one m7
+htc one m8
+htc one m9
+huawei honor 8
+htc one m10
+oneplus 2
+huawei honor 7
+nexus 6p
+xiaomi mi 4
+samsung galaxy note 5
+samsung galaxy note 4
+samsung galaxy note 7
+samsung galaxy note 6
+xiaomi mi 6
+google pixel
+oneplus one
+broken screen
+oneplus 3
+moto x

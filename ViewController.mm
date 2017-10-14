@@ -28,6 +28,12 @@ const std::string input_layer_name = "Mul";
 const std::string output_layer_name = "final_result";
 
 
+// TODO load this from file like labels
+NSArray *prices = [NSArray arrayWithObjects:@(65.78), @(99.99), @(178.5), @(133), @(183), @(316.45), @(589), @(175), @(563.0625), @(285.2225), @(110.99), @(106.625), @(147.5), @(93.63), @(450), @(300), @(253.5), @(250), @(111.72), @(164.75), @(300), @(422.5), @(198.5), @(90), @(100), @(119.98), @(230.7), @(394.5), @(191.25), @(260), @(269), @(147.24), @(117), @(250), @(155.25), @(200), @(250), @(352.99), @(530), @(144.5), @(0), @(355.265), @(103.74), nil];
+
+NSArray *labels = [NSArray arrayWithObjects:@"lg g3", @"samsung galaxy s3", @"lg g5", @"samsung galaxy s5", @"samsung galaxy s6", @"samsung galaxy s7", @"samsung galaxy s8", @"nexus 5x", @"iphone 7", @"iphone 6", @"iphone 5", @"iphone 4", @"samsung galaxy s4", @"lg g4", @"huawei mate 9", @"huawei mate 8", @"nexus 6", @"xiaomi mi 5", @"nexus 4", @"nexus 5", @"lg v20", @"lg g6", @"huawei mate 7", @"htc one m7", @"htc one m8", @"htc one m9", @"huawei honor 8", @"htc one m10", @"oneplus 2", @"huawei honor 7", @"nexus 6p", @"xiaomi mi 4", @"samsung galaxy note 3", @"samsung galaxy note 5", @"samsung galaxy note 4", @"samsung galaxy note 7", @"samsung galaxy note 6", @"xiaomi mi 6", @"google pixel", @"oneplus one", @"broken screen", @"oneplus 3", @"moto x", nil];
+
+NSDictionary *priceMap = [NSDictionary dictionaryWithObjects:prices forKeys:labels];
 
 static const NSString *AVCaptureStillImageIsCapturingStillImageContext =
     @"AVCaptureStillImageIsCapturingStillImageContext";
@@ -154,7 +160,7 @@ static const NSString *AVCaptureStillImageIsCapturingStillImageContext =
 - (IBAction)takePicture:(id)sender {
   if ([session isRunning]) {
     [session stopRunning];
-    [sender setTitle:@"Continue" forState:UIControlStateNormal];
+    [sender setTitle:@"" forState:UIControlStateNormal];
 
     flashView = [[UIView alloc] initWithFrame:[previewView frame]];
     [flashView setBackgroundColor:[UIColor whiteColor]];
@@ -179,7 +185,7 @@ static const NSString *AVCaptureStillImageIsCapturingStillImageContext =
 
   } else {
     [session startRunning];
-    [sender setTitle:@"Freeze" forState:UIControlStateNormal];
+    [sender setTitle:@"" forState:UIControlStateNormal];
   }
 }
 
@@ -510,15 +516,14 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
 
 // Write predictions
 - (void)setPredictionValues:(NSDictionary *)newValues {
-  const float decayValue = 0.75f;  // how fast predictions decay
-  const float updateValue = 0.25f;
-  const float minimumThreshold = 0.01f;
-
-  NSMutableDictionary *decayedPredictionValues =
-      [[NSMutableDictionary alloc] init];
+  const float decayValue = 0.9f;  // how fast predictions decay
+  const float updateValue = 0.1f;
+  const float minimumThreshold = 0.02f;
+  float price = 0.0f;
+  float confSum = 0.0f;
+  NSMutableDictionary *decayedPredictionValues = [[NSMutableDictionary alloc] init];
   for (NSString *label in oldPredictionValues) {
-    NSNumber *oldPredictionValueObject =
-        [oldPredictionValues objectForKey:label];
+    NSNumber *oldPredictionValueObject = [oldPredictionValues objectForKey:label];
     const float oldPredictionValue = [oldPredictionValueObject floatValue];
     const float decayedPredictionValue = (oldPredictionValue * decayValue);
     if (decayedPredictionValue > minimumThreshold) {
@@ -530,20 +535,27 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
   }
   [oldPredictionValues release];
   oldPredictionValues = decayedPredictionValues;
-
   for (NSString *label in newValues) {
+    NSNumber *labelPrice = [priceMap objectForKey:label];
     NSNumber *newPredictionValueObject = [newValues objectForKey:label];
-    NSNumber *oldPredictionValueObject =
-        [oldPredictionValues objectForKey:label];
+    NSNumber *oldPredictionValueObject = [oldPredictionValues objectForKey:label];
     if (!oldPredictionValueObject) {
-      oldPredictionValueObject = [NSNumber numberWithFloat:0.0f];
+       oldPredictionValueObject = [NSNumber numberWithFloat:0.0f];
     }
+
     const float newPredictionValue = [newPredictionValueObject floatValue];
     const float oldPredictionValue = [oldPredictionValueObject floatValue];
-    const float updatedPredictionValue =
-        (oldPredictionValue + (newPredictionValue * updateValue));
-    NSNumber *updatedPredictionValueObject =
-        [NSNumber numberWithFloat:updatedPredictionValue];
+    const float updatedPredictionValue = (oldPredictionValue + (newPredictionValue * updateValue));
+    const float labelPriceValue = [labelPrice floatValue];
+    // Update price
+    confSum += updatedPredictionValue;
+    if ([label isEqualToString:@"broken screen"]) {
+      price *= (1 - updatedPredictionValue);  // broken penalty
+    } else {
+      price += labelPriceValue * updatedPredictionValue;
+    }
+
+    NSNumber *updatedPredictionValueObject = [NSNumber numberWithFloat:updatedPredictionValue];
     [oldPredictionValues setObject:updatedPredictionValueObject forKey:label];
   }
   NSArray *candidateLabels = [NSMutableArray array];
@@ -563,56 +575,76 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
       [NSSortDescriptor sortDescriptorWithKey:@"value" ascending:NO];
   NSArray *sortedLabels = [candidateLabels
       sortedArrayUsingDescriptors:[NSArray arrayWithObject:sort]];
-
+  
+  price /= confSum;  // Normalize
 //  const float headerValueWidth = 96.0f;
 //  const float headerLabelWidth = 198.0f;
-  NSString *defaultFont = @"Helvetica Neue-Regular";
-  const float colMargin = 0;
-  const float rowMargin = 0;
-  const float rowHeight = 26.0f;  // header, label and value height
-  const float entryMargin = rowMargin + rowHeight;
 
-  const float valueWidth = 100.0f;
-  const float labelWidth = 2000.0f;  // use full width TODO get this from device
+  // Set screen width
+  CGFloat width  = [UIScreen mainScreen].nativeBounds.size.width;
+  UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+  if (orientation == UIInterfaceOrientationPortraitUpsideDown || orientation == UIInterfaceOrientationPortrait)
+    width /= 2;
+  
+  NSString *defaultFont = @"Helvetica Neue-Regular";
+  NSString *priceText = [NSString stringWithFormat:@"$%0.2f", price];
+  const float titleHeight = 45.0f;
+  const float colMargin = 0;
+//  const float rowMargin = 20;
+  const float rowHeight = 22.0f;  // header, label and value height
+//  const float entryMargin = rowMargin + rowHeight;
+
+  const float valueWidth = 105.0f;
 //  const float labelMarginX = 5.0f;
 
   if ([sortedLabels count] > 0) {
     [self removeAllLabelLayers];
   }
-  else {    // No dog detected
+  else {    // Not detected
     [self removeAllLabelLayers];
-    [self addLabelLayerWithText:@"Point camera at a dog..."
+    [self addLabelLayerWithText:@"Point camera at a smartphone..."
                         font:defaultFont
                         originX:2*colMargin
-                        originY:2*rowMargin
-                        width:labelWidth
+                        originY:0
+                        width:width
                         height:rowHeight
+                        fontSize:16.0f
                         alignment:kCAAlignmentLeft];
   }
-
   int labelCount = 0;
   for (NSDictionary *entry in sortedLabels) {
     
     // Add header
     if (labelCount == 0) {
+        // Add price entry
+        [self addLabelLayerWithText:priceText
+                            font:@"Helvetica-Bold"
+                            originX:0
+                            originY:0
+                            width:width
+                            height:titleHeight
+                            fontSize:34.0f
+                            alignment:kCAAlignmentCenter];
 
-        [self addLabelLayerWithText:@"Likelihood"
-                            font:@"Helvetica-Bold"
-                            originX:colMargin
-                            originY:rowMargin
-                            width:valueWidth
-                            height:rowHeight
-                            alignment:kCAAlignmentRight];
-        
-        const float breedOriginX = (colMargin + valueWidth + colMargin);
-        
-        [self addLabelLayerWithText:@"Dog Breed"
-                            font:@"Helvetica-Bold"
-                            originX:breedOriginX
-                            originY:rowMargin
-                            width:labelWidth
-                            height:rowHeight
-                            alignment:kCAAlignmentLeft];
+//        [self addLabelLayerWithText:@"Likelihood"
+//                            font:@"Helvetica-Bold"
+//                            originX:colMargin
+//                            originY:rowMargin
+//                            width:valueWidth
+//                            height:rowHeight
+//                            fontSize:16.0f
+//                            alignment:kCAAlignmentRight];
+//        
+//        const float breedOriginX = (colMargin + valueWidth + colMargin);
+//        
+//        [self addLabelLayerWithText:@"Phone Model"
+//                            font:@"Helvetica-Bold"
+//                            originX:breedOriginX
+//                            originY:rowMargin
+//                            width:labelWidth
+//                            height:rowHeight
+//                            fontSize:16.0f
+//                            alignment:kCAAlignmentLeft];
     }
     
     // Add label entry
@@ -620,9 +652,8 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
     NSNumber *valueObject = [entry objectForKey:@"value"];
     const float value = [valueObject floatValue];
     
-    const float originY =
-    (entryMargin + (rowHeight * labelCount));
-    
+//    const float originY = (entryMargin + (rowHeight * labelCount));
+    const float originY = titleHeight + rowHeight * labelCount;
     const int valuePercentage = (int)roundf(value * 100.0f);
     NSString *valueText = [NSString stringWithFormat:@"%d%%", valuePercentage];
       
@@ -632,6 +663,7 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
                         originY:originY
                         width:valueWidth
                         height:rowHeight
+                        fontSize:14.0f
                         alignment:kCAAlignmentRight];
 
     const float labelOriginX = (colMargin + valueWidth + colMargin);
@@ -640,18 +672,22 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
                         font:defaultFont
                         originX:labelOriginX
                         originY:originY
-                        width:labelWidth
+                        width:width
                         height:rowHeight
+                        fontSize:14.0f
                         alignment:kCAAlignmentLeft];
+  
+    
     
     // Speak if 50% confident
     if ((labelCount == 0) && (value > 0.5f)) {
-      [self speak:[label capitalizedString]];
+      NSString *speakText = [NSString stringWithFormat:@"%@ %@", label, priceText];
+      [self speak:[speakText capitalizedString]];
     }
     
     // Limit # labels to display
     labelCount += 1;
-    if (labelCount > 1) {
+    if (labelCount > 6) {
       break;
     }
   }
@@ -670,9 +706,10 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
                       originY:(float)originY
                         width:(float)width
                        height:(float)height
+                       fontSize:(float)fontSize
                     alignment:(NSString *)alignment {
 //  NSString *const font = @"Helvetica Neue-Regular";
-  const float fontSize = 16.0f;
+//  const float fontSize = 16.0f;
 
   const float marginSizeX = 5.0f;
   const float marginSizeY = 2.0f;
@@ -731,7 +768,7 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
 }
 
 
-// Speak dog breed
+// Speak
 - (void)speak:(NSString *)words {
   if ([synth isSpeaking]) {
     return;
