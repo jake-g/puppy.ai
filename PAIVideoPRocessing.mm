@@ -326,7 +326,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     return rotatedBuffer;
 }
-//TODO Video - teardown
+//Video - teardown
 void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddress)
 {
     // Free the memory we malloced for the vImage rotation
@@ -334,6 +334,7 @@ void freePixelBufferDataAfterRelease(void *releaseRefCon, const void *baseAddres
 }
 
 -(void)setVideoOriantation:(AVCaptureConnection *)connection {
+    //TODO Improvement needed
     UIInterfaceOrientation interfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
     AVCaptureVideoOrientation newOrientation = AVCaptureVideoOrientationPortrait;
     
